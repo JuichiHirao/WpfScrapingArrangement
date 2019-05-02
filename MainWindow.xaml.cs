@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 using Codeplex.Data;
 using WpfScrapingArrangement.service;
 using WpfScrapingArrangement.collection;
+using WpfScrapingArrangement.data;
 
 namespace WpfScrapingArrangement
 {
@@ -44,6 +45,8 @@ namespace WpfScrapingArrangement
         private FileGeneTargetFilesCollection ColViewDestFiles; // dgridDestFile
         private MakerCollection ColViewMaker;
         private KoreanPornoCollection ColViewKoreanPorno;
+
+        private List<ReplaceInfoData> dispctrlListReplaceInfoActress;
 
         private List<MovieMaker> dispinfoSelectDataGridMakers = null;
         private MovieImportData dispinfoSelectDataGridKoreanPorno = null;
@@ -257,6 +260,10 @@ namespace WpfScrapingArrangement
 
             DbConnection localDbCon = new DbConnection();
             txtbDbNowDate.Text = localDbCon.getDateStringSql("SELECT GETDATE()");
+
+            ReplaceInfoService serviceReplaceInfo = new ReplaceInfoService();
+            dispctrlListReplaceInfoActress = serviceReplaceInfo.GetTypeAll(data.ReplaceInfoData.EnumType.actress, new MySqlDbConnection());
+
         }
 
         /// <summary>
@@ -639,11 +646,21 @@ namespace WpfScrapingArrangement
             if (result == MessageBoxResult.Cancel)
                 return;
 
-            FilesRegisterService service = new FilesRegisterService(new DbConnection());
+            foreach (TargetFiles file in files)
+            {
+                if (file.IsSelected)
+                {
+                    Debug.Print("削除フラグ ゴミ箱移動 [" + file.FileInfo.FullName + "]");
+                    FileSystem.DeleteFile(
+                        file.FileInfo.FullName,
+                        UIOption.OnlyErrorDialogs,
+                        RecycleOption.SendToRecycleBin);
+                }
+            }
 
-            service.targetImportData = dispinfoSelectMovieImportData;
-
-            service.DeleteExecute(files);
+            // MOVIE_IMPORTから削除
+            MovieImportService serviceImport = new MovieImportService();
+            serviceImport.DbDelete(dispinfoSelectMovieImportData, new MySqlDbConnection());
 
             btnFileGenSearch_Click(null, null);
 
@@ -1695,6 +1712,17 @@ namespace WpfScrapingArrangement
             string ClipboardText = ClipBoardCommon.GetText();
 
             txtTag.Text = dispinfoSelectMovieImportData.ConvertActress(ClipboardText, ",");
+
+            string message = "";
+            foreach(ReplaceInfoData replaceInfoData in dispctrlListReplaceInfoActress)
+            {
+                if (txtTag.Text.IndexOf(replaceInfoData.Source) >= 0)
+                {
+                    txtTag.Text = txtTag.Text.Replace(replaceInfoData.Source, replaceInfoData.Destination);
+                    message = message + "、" + replaceInfoData.Source + "->" + replaceInfoData.Destination;
+                }
+            }
+            txtStatusBar.Text = message;
 
             GenerateFilename(null, null);
         }

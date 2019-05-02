@@ -86,6 +86,7 @@
     <Compile Include="data\KoreanPornoData.cs" />
     <Compile Include="data\KoreanPornoFileInfo.cs" />
     <Compile Include="data\MovieImportData.cs" />
+    <Compile Include="data\ReplaceInfoData.cs" />
     <Compile Include="DynamicJson.cs" />
     <Compile Include="RowColorConverterKoreanPorno.cs" />
     <Compile Include="service\DateCopyService.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="service\KoreanPornoService.cs" />
     <Compile Include="service\MovieFileContentsService.cs" />
     <Compile Include="service\MovieImportService.cs" />
+    <Compile Include="service\ReplaceInfoService.cs" />
     <Compile Include="Setting.cs" />
     <Compile Include="SettingXmlControl.cs" />
     <Compile Include="TargetFiles.cs" />
