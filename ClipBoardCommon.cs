@@ -16,11 +16,14 @@ namespace WpfScrapingArrangement
                 // クリップボードのテキストを改行毎に配列に設定
                 string[] ClipBoardList = ClipboardText.Split('\n');
 
+                ClipboardText = string.Join(" ", ClipBoardList);
+                /*
                 foreach (string text in ClipBoardList)
                 {
                     if (text.Trim().Length > 0)
                         ClipboardText = text;
                 }
+                 */
             }
             if (data.GetDataPresent(DataFormats.FileDrop))
             {

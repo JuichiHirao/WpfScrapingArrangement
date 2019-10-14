@@ -12,7 +12,6 @@ namespace WpfScrapingArrangement.collection
         public List<MovieImportData> listData;
         public ICollectionView ColViewListData;
 
-
         KoreanPornoService service;
         MovieImportService serviceImport;
 

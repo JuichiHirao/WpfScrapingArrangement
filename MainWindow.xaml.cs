@@ -1033,6 +1033,7 @@ namespace WpfScrapingArrangement
                 {
                     cmbSearchResult.ItemsSource = null;
                     txtbSearchResultCount.Text = Convert.ToString(0);
+                    txtStatusBar.Text = dispinfoSelectMovieImportData.Detail;
                 }
 
                 SetUIElementFromImportData(dispinfoSelectMovieImportData);
@@ -1789,7 +1790,7 @@ namespace WpfScrapingArrangement
                 TxtKoreanPornoTag.Text = selData.Tag;
                 TxtKoreanPornoPostedIn.Text = selData.Actresses;
 
-                KoreanPornoService service = new KoreanPornoService(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text);
+                KoreanPornoService service = new KoreanPornoService(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text, (bool)ChkKoreanPornoMoveFolder.IsChecked);
                 List<KoreanPornoFileInfo> listFiles = service.GetFileInfo(selData.CopyText, selData.JavPostDate, dispinfoSelectDataGridKoreanPorno.ProductNumber);
 
                 if (listFiles == null)
@@ -1823,15 +1824,37 @@ namespace WpfScrapingArrangement
         {
             try
             {
+                List<KoreanPornoFileInfo> fileList = (List<KoreanPornoFileInfo>)dgridKoreanPornoFolder.ItemsSource;
+
+                int movieCount = 0;
+                foreach (KoreanPornoFileInfo data in fileList)
+                {
+                    if (data.IsSelected && data.FileInfo.Extension == ".jpg")
+                        continue;
+                    else if (data.IsSelected)
+                        movieCount++;
+                }
+
+                bool ischeck = (bool)(ChkKoreanPornoMoveFolder.IsChecked == null ? false : ChkKoreanPornoMoveFolder.IsChecked);
+                if (movieCount > 5 && ischeck == false)
+                {
+                    MessageBoxResult result = MessageBox.Show("動画ファイルの個数が5個を超えていて\nフォルダ構成のチェック無し、良い？", "確認", MessageBoxButton.OKCancel);
+
+                    if (result == MessageBoxResult.Cancel)
+                        return;
+
+                }
+
                 MovieImportData selData = dispinfoSelectDataGridKoreanPorno;
                 selData.CopyText = TxtKoreanPornoName.Text;
                 selData.ProductNumber = TxtKoreanPornoArchiveFile.Text;
                 selData.Tag = TxtKoreanPornoTag.Text;
 
-                KoreanPornoService service = new KoreanPornoService(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text);
+                KoreanPornoService service = new KoreanPornoService(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text, ChkKoreanPornoMoveFolder.IsChecked);
                 service.ExecuteArrangement(selData, (List<KoreanPornoFileInfo>)dgridKoreanPornoFolder.ItemsSource);
 
                 ColViewKoreanPorno.Delete(dispinfoSelectDataGridKoreanPorno);
+                ChkKoreanPornoMoveFolder.IsChecked = false;
             }
             catch (Exception ex)
             {

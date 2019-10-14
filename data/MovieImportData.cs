@@ -635,7 +635,7 @@ namespace WpfScrapingArrangement
         }
         public string ConvertActress(string myText, string mySeparator)
         {
-            string[] arrSplit = { "／", " ", ",", "　" };
+            string[] arrSplit = { "／", " ", ",", "　", "・" };
             string sepa = "";
             string[] arrActress = null;
             string actresses = "";

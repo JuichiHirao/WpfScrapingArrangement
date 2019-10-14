@@ -15,10 +15,17 @@ namespace WpfScrapingArrangement.service
 
         public string ExportPath;
 
-        public KoreanPornoService(string myPath, string myExportPath)
+        private bool IsCheckMoveFolder;
+
+        public KoreanPornoService(string myPath, string myExportPath, bool? myIsCheckMoveFolder)
         {
             BasePath = myPath;
             ExportPath = myExportPath;
+
+            if (myIsCheckMoveFolder != null)
+                IsCheckMoveFolder = Convert.ToBoolean(myIsCheckMoveFolder);
+            else
+                IsCheckMoveFolder = false;
         }
 
         public List<KoreanPornoFileInfo> GetFileInfo(string myBaseFilename, DateTime myChangeLastWriteTime, string myArchiveName)
@@ -165,11 +172,11 @@ namespace WpfScrapingArrangement.service
 
             // ファイル移動先の生成（D:\Downloads\TEMP\KOREAN_PORNO7のフォルダを無ければ作成）
             string moveDestName = new DirectoryInfo(ExportPath).Name;
-            string moveDestPath = "";
+            string moveDestPath = Path.Combine(BasePath, moveDestName);
 
             if (!Directory.Exists(moveDestPath))
             {
-                DirectoryInfo dir = Directory.CreateDirectory(Path.Combine(BasePath, moveDestName));
+                DirectoryInfo dir = Directory.CreateDirectory(moveDestPath);
                 moveDestPath = dir.FullName;
             }
 
@@ -177,12 +184,48 @@ namespace WpfScrapingArrangement.service
             foreach (var jpegFile in jpegFiles)
                 File.Move(jpegFile.FileInfo.FullName, Path.Combine(moveDestPath, jpegFile.ChangeFilename));
 
+            // フォルダ作成しての動画の移動はJPEGの移動が終了してから
+            if (IsCheckMoveFolder == true)
+            {
+                moveDestPath = Path.Combine(moveDestPath, targetData.Name);
+
+                if (!Directory.Exists(moveDestPath))
+                {
+                    DirectoryInfo dir = Directory.CreateDirectory(moveDestPath);
+                    moveDestPath = dir.FullName;
+                }
+            }
+
             // 動画ファイルの移動、ファイル更新日
             foreach (KoreanPornoFileInfo file in movieFiles)
             {
-                string destFilename = System.IO.Path.Combine(moveDestPath, file.ChangeFilename);
-                File.SetLastWriteTime(file.FileInfo.FullName, file.ChangeLastWriteTime);
+                string filename = "";
+                if (IsCheckMoveFolder == true)
+                    filename = file.DisplayFilename;
+                else
+                    filename = file.ChangeFilename;
+
+                string destFilename = System.IO.Path.Combine(moveDestPath, filename);
+                // File.SetLastWriteTime(file.FileInfo.FullName, file.ChangeLastWriteTime);
                 File.Move(file.FileInfo.FullName, destFilename);
+            }
+
+            if (IsCheckMoveFolder == true)
+            {
+                foreach (KoreanPornoFileInfo file in myListFileInfo)
+                {
+                    if (file.FileInfo.Extension == ".txt")
+                        continue;
+
+                    if (file.FileInfo.Extension == ".zip")
+                        continue;
+
+                    if (!File.Exists(file.FileInfo.FullName))
+                        continue;
+
+                    string destFilename = System.IO.Path.Combine(moveDestPath, file.DisplayFilename);
+                    File.Move(file.FileInfo.FullName, destFilename);
+                }
             }
 
             string rarFile = myTargetImportData.ProductNumber + ".rar";

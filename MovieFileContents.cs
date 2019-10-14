@@ -10,7 +10,7 @@ namespace WpfScrapingArrangement
 {
     public class MovieFileContents
     {
-        public static string REGEX_MOVIE_EXTENTION = @".*(\.avi)|.*(\.wmv)|.*(\.mpg)|.*(\.ts)|.*(\.divx)|.*(\.mp4)|.*(\.asf)|.*(\.mkv)|.*(\.m4v)|.*(\.rmvb)|.*(\.rm)|.*(\.flv)|.*(\.mov)|.*(\.3gp)";
+        public static string REGEX_MOVIE_EXTENTION = @".*(\.avi)|.*(\.wmv)|.*(\.mpg)|.*(\.ts)|.*(\.divx)|.*(\.mp4)|.*(\.asf)|.*(\.mkv)|.*(\.m4v)|.*(\.rmvb)|.*(\.rm)|.*(\.flv)|.*(\.mov)|.*(\.3gp)|.*(\.qt)|.*(\.k3g)";
         //  @".*\.avi$|.*\.wmv$|.*\.mpg$|.*ts$|.*divx$|.*mp4$|.*asf$|.*jpg$|.*jpeg$|.*iso$|.*mkv$";
 
         public const int KIND_AVRIP = 1;
