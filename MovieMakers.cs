@@ -12,61 +12,6 @@ namespace WpfScrapingArrangement
 {
     class MovieMakers
     {
-        public static MovieMaker GetSearchByProductNumber(string myProductNumber)
-        {
-            DbConnection dbcon = new DbConnection();
-
-            if (myProductNumber == null)
-                myProductNumber = "";
-
-            string[] product = myProductNumber.Split('-');
-            List<MovieFileContents> listMContents = new List<MovieFileContents>();
-
-            string queryString = "SELECT ID, NAME, SIZE, FILE_DATE, LABEL, SELL_DATE, PRODUCT_NUMBER FROM MOVIE_FILES WHERE PRODUCT_NUMBER LIKE @pProduct ORDER BY FILE_DATE DESC ";
-
-            dbcon.openConnection();
-
-            SqlCommand command = new SqlCommand(queryString, dbcon.getSqlConnection());
-
-            SqlParameter param = new SqlParameter("@pProduct", SqlDbType.VarChar);
-            param.Value = product[0] + "-%";
-            command.Parameters.Add(param);
-
-            SqlDataReader reader = command.ExecuteReader();
-
-            do
-            {
-                while (reader.Read())
-                {
-                    MovieFileContents data = new MovieFileContents();
-
-                    data.Id = DbExportCommon.GetDbInt(reader, 0);
-                    data.Name = DbExportCommon.GetDbString(reader, 1);
-                    data.Size = DbExportCommon.GetLong(reader, 2);
-                    data.FileDate = DbExportCommon.GetDbDateTime(reader, 3);
-                    data.Label = DbExportCommon.GetDbString(reader, 4);
-                    data.SellDate = DbExportCommon.GetDbDateTime(reader, 5);
-                    data.ProductNumber = DbExportCommon.GetDbString(reader, 6);
-
-                    listMContents.Add(data);
-                }
-            } while (reader.NextResult());
-
-            reader.Close();
-
-            dbcon.closeConnection();
-
-            MovieMaker maker = null;
-            foreach(MovieFileContents data in listMContents)
-            {
-                maker = new MovieMaker();
-                maker.ParseFromFileName(data);
-                break;
-            }
-
-            return maker;
-        }
-
         public static List<MovieMaker> GetAllData()
         {
             MySqlDbConnection dbcon = new MySqlDbConnection();

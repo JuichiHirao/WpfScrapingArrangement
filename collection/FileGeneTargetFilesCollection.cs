@@ -14,9 +14,12 @@ namespace WpfScrapingArrangement.collection
     class FileGeneTargetFilesCollection
     {
         public static string REGEX_RARONLY_EXTENTION = @".*\.rar$";
-        public static string REGEX_MOVIE_EXTENTION = @".*\.avi$|.*\.wmv$|.*\.mpg$|.*ts$|.*divx$|.*mp4$|.*asf$|.*png$|.*jpg$|.*jpeg$|.*iso$|.*mkv$|.*\.m4v|.*\.rmvb|.*\.rm|.*\.mov|.*\.3gp|.*\.qt";
+        public static string REGEX_MOVIE_EXTENTION = @".*\.avi$|.*\.wmv$|.*\.mpg$|.*ts$|.*divx$|.*mp4$|.*asf$|.*png$|.*jpg$|.*jpeg$|.*iso$|.*mkv$|.*\.m4v|.*\.rmvb|.*\.rm|.*\.flv|.*\.mov|.*\.3gp|.*\.qt";
+        // MovieFileContents public static string REGEX_MOVIE_EXTENTION = @".*(\.avi)|.*(\.wmv)|.*(\.mpg)|.*(\.ts)|.*(\.divx)|.*(\.mp4)|.*(\.asf)|.*(\.mkv)|.*(\.m4v)|.*(\.rmvb)|.*(\.rm)|.*(\.flv)|.*(\.mov)|.*(\.3gp)|.*(\.qt)|.*(\.k3g)";
+        //  @".*\.avi$|.*\.wmv$|.*\.mpg$|.*ts$|.*divx$|.*mp4$|.*asf$|.*jpg$|.*jpeg$|.*iso$|.*mkv$";
         public static string REGEX_MOVIEONLY_EXTENTION = @".*\.avi$|.*\.wmv$|.*\.mpg$|.*ts$|.*divx$|.*mp4$|.*asf$|.*iso$|.*mkv$|.*\.m4v|.*\.rmvb|.*\.rm|.*\.mov|.*\.3gp|.*\.qt";
         public static string REGEX_TARGETFILE_EXTENTION = @".*\.avi$|.*\.wmv$|.*\.mpg$|.*ts$|.*divx$|.*mp4$|.*asf$|.*png$|.*jpg$|.*jpeg$|.*iso$|.*mkv$|.*\.m4v|.*\.rmvb|.*\.rm|.*\.rar|.*\.mov|.*\.3gp|.*\.qt";
+        public static string REGEX_IMAGE_EXTENTION = @".*\.jpg$|.*\.gif$";
 
         public List<TargetFiles> listTargetFiles = null;
         public ICollectionView ColViewListTargetFiles;

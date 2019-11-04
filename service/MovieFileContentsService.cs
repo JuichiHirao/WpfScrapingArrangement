@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Data;
 using System.Data.SqlClient;
+using WpfScrapingArrangement.collection;
 
 namespace WpfScrapingArrangement
 {
@@ -24,7 +25,7 @@ namespace WpfScrapingArrangement
 
             string[] files = Directory.GetFiles(myPathname);
 
-            Regex regex = new Regex(MovieFileContents.REGEX_MOVIE_EXTENTION);
+            Regex regex = new Regex(FileGeneTargetFilesCollection.REGEX_MOVIE_EXTENTION);
             List<string> listFiles = new List<string>();
 
             foreach (var file in files)

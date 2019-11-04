@@ -10,15 +10,14 @@ namespace WpfScrapingArrangement
 {
     public class MovieFileContents
     {
-        public static string REGEX_MOVIE_EXTENTION = @".*(\.avi)|.*(\.wmv)|.*(\.mpg)|.*(\.ts)|.*(\.divx)|.*(\.mp4)|.*(\.asf)|.*(\.mkv)|.*(\.m4v)|.*(\.rmvb)|.*(\.rm)|.*(\.flv)|.*(\.mov)|.*(\.3gp)|.*(\.qt)|.*(\.k3g)";
-        //  @".*\.avi$|.*\.wmv$|.*\.mpg$|.*ts$|.*divx$|.*mp4$|.*asf$|.*jpg$|.*jpeg$|.*iso$|.*mkv$";
-
         public const int KIND_AVRIP = 1;
         public const int KIND_IVRIP = 2;
         public const int KIND_URAAVRIP = 3;
         public int Id { get; set; }
         public string Name { get; set; }
         public string Label { get; set; }
+
+        public string StoreLabel { get; set; }
         public long Size { get; set; }
         public string DispFileDate { get; set; }
         public DateTime FileDate { get; set; }

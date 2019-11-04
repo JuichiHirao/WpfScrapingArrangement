@@ -244,50 +244,6 @@ namespace WpfScrapingArrangement
             }
         }
 
-        public void DatabaseExport(DbConnection myDbCon)
-        {
-            DbConnection dbcon = new DbConnection();
-
-            // データベースへ登録
-            string sqlCommand = "INSERT INTO MOVIE_FILES (NAME, SIZE, FILE_DATE, LABEL, SELL_DATE, PRODUCT_NUMBER, FILE_COUNT, EXTENSION, TAG) VALUES( @pName, @pSize, @pFileDate, @pLabel, @pSellDate, @pProductNumber, @pFileCount, @pExtension, @Tag )";
-
-            SqlCommand command = new SqlCommand(sqlCommand, dbcon.getSqlConnection());
-            SqlParameter[] sqlparams = new SqlParameter[9];
-            // Create and append the parameters for the Update command.
-            sqlparams[0] = new SqlParameter("@pName", SqlDbType.VarChar);
-            sqlparams[0].Value = DatabaseMovieFile.Name;
-
-            sqlparams[1] = new SqlParameter("@pSize", SqlDbType.Decimal);
-            sqlparams[1].Value = DatabaseMovieFile.Size;
-
-            sqlparams[2] = new SqlParameter("@pFileDate", SqlDbType.DateTime);
-            sqlparams[2].Value = DatabaseMovieFile.FileDate;
-
-            sqlparams[3] = new SqlParameter("@pLabel", SqlDbType.VarChar);
-            sqlparams[3].Value = LabelPath;
-
-            sqlparams[4] = new SqlParameter("@pSellDate", SqlDbType.DateTime);
-            if (DatabaseMovieFile.SellDate.Year >= 2000)
-                sqlparams[4].Value = DatabaseMovieFile.SellDate;
-            else
-                sqlparams[4].Value = Convert.DBNull;
-
-            sqlparams[5] = new SqlParameter("@pProductNumber", SqlDbType.VarChar);
-            sqlparams[5].Value = DatabaseMovieFile.ProductNumber;
-
-            sqlparams[6] = new SqlParameter("@pFileCount", SqlDbType.Int);
-            sqlparams[6].Value = DatabaseMovieFile.FileCount;
-
-            sqlparams[7] = new SqlParameter("@pExtension", SqlDbType.VarChar);
-            sqlparams[7].Value = DatabaseMovieFile.Extension;
-
-            sqlparams[8] = new SqlParameter("@Tag", SqlDbType.VarChar);
-            sqlparams[8].Value = DatabaseMovieFile.Tag;
-
-            dbcon.SetParameter(sqlparams);
-            dbcon.execSqlCommand(sqlCommand);
-        }
-
         public void RemoveTextFilenameLine()
         {
             System.IO.StreamReader strmReader = null;

@@ -1,10 +1,13 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Text.RegularExpressions;
+using WpfScrapingArrangement.collection;
+using WpfScrapingArrangement.data;
 
 namespace WpfScrapingArrangement.service
 {
@@ -37,7 +40,18 @@ namespace WpfScrapingArrangement.service
             if (!Directory.Exists(pathname) && !File.Exists(pathname))
                 return null;
 
-            string[] jpegFiles = Directory.GetFiles(BasePath, myArchiveName + "*jpg", System.IO.SearchOption.TopDirectoryOnly);
+            Regex regexImage = new Regex(FileGeneTargetFilesCollection.REGEX_IMAGE_EXTENTION, RegexOptions.IgnoreCase);
+
+            List<string> jpegFileList = new List<string>();
+
+            string[] archiveFiles = Directory.GetFiles(BasePath, myArchiveName + "*", System.IO.SearchOption.TopDirectoryOnly);
+            foreach (string file in archiveFiles)
+            {
+                if (regexImage.IsMatch(file))
+                    jpegFileList.Add(file);
+            }
+
+            string[] jpegFiles = jpegFileList.ToArray();
 
             int fileNo = 1;
             foreach (string file in jpegFiles)
@@ -70,7 +84,7 @@ namespace WpfScrapingArrangement.service
                 files[0] = pathname;
             }
 
-            Regex regex = new Regex(MovieFileContents.REGEX_MOVIE_EXTENTION, RegexOptions.IgnoreCase);
+            Regex regex = new Regex(FileGeneTargetFilesCollection.REGEX_MOVIE_EXTENTION, RegexOptions.IgnoreCase);
 
             List<KoreanPornoFileInfo> listKFiles = new List<KoreanPornoFileInfo>();
             int fileCnt = 0;
@@ -130,14 +144,15 @@ namespace WpfScrapingArrangement.service
             return selFiles;
         }
 
-        public void ExecuteArrangement(MovieImportData myTargetImportData, List<KoreanPornoFileInfo> myListFileInfo)
+        public void ExecuteArrangement(MovieImportData myTargetImportData, StoreData myStoreData, List<KoreanPornoFileInfo> myListFileInfo)
         {
             List<KoreanPornoFileInfo> jpegFiles = new List<KoreanPornoFileInfo>();
             List<KoreanPornoFileInfo> movieFiles = new List<KoreanPornoFileInfo>();
 
+            Regex regex = new Regex(FileGeneTargetFilesCollection.REGEX_IMAGE_EXTENTION, RegexOptions.IgnoreCase);
             foreach (KoreanPornoFileInfo data in myListFileInfo)
             {
-                if (data.IsSelected && data.FileInfo.Extension == ".jpg")
+                if (data.IsSelected && regex.IsMatch(data.FileInfo.Name))
                     jpegFiles.Add(data);
                 else if (data.IsSelected)
                     movieFiles.Add(data);
@@ -168,6 +183,7 @@ namespace WpfScrapingArrangement.service
             targetData.LastWriteTime = myTargetImportData.JavPostDate;
             targetData.Tag = myTargetImportData.Tag;
 
+            DbExportContents(targetData, myStoreData);
             DbExport(targetData, new DbConnection());
 
             // ファイル移動先の生成（D:\Downloads\TEMP\KOREAN_PORNO7のフォルダを無ければ作成）
@@ -297,6 +313,57 @@ namespace WpfScrapingArrangement.service
             myDbCon.execSqlCommand(sqlCommand);
 
             return;
+        }
+
+        public void DbExportContents(KoreanPornoData myData, StoreData myStoreData)
+        {
+            MySqlDbConnection dbcon = new MySqlDbConnection();
+
+            // データベースへ登録
+            string sqlCommand = "INSERT INTO av.contents (store_label, name, extension, tag, file_date, file_count, size, file_status) "
+                + "VALUES( @pStoreLabel, @pName, @pExtension, @pTag, @pFileDate, @pFileCount, @pSize, @pFileStatus )";
+
+            MySqlCommand command = new MySqlCommand(sqlCommand, dbcon.getMySqlConnection());
+
+            List<MySqlParameter> listParams = new List<MySqlParameter>();
+
+            MySqlParameter param = new MySqlParameter("@pStoreLabel", MySqlDbType.VarChar);
+            param.Value = myStoreData.Label;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pName", MySqlDbType.VarChar);
+            param.Value = myData.Name;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pExtension", MySqlDbType.VarChar);
+            param.Value = myData.Extension;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pTag", MySqlDbType.VarChar);
+            param.Value = myData.Tag;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pFileDate", MySqlDbType.DateTime);
+            if (myData.LastWriteTime.Year >= 2000)
+                param.Value = myData.LastWriteTime;
+            else
+                param.Value = Convert.DBNull;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pFileCount", MySqlDbType.Int32);
+            param.Value = myData.FileCount;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pSize", MySqlDbType.Decimal);
+            param.Value = myData.Size;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pFileStatus", MySqlDbType.VarChar);
+            param.Value = "exist";
+            listParams.Add(param);
+
+            dbcon.SetParameter(listParams.ToArray());
+            dbcon.execSqlCommand(sqlCommand);
         }
 
     }

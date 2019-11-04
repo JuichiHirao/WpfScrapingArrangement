@@ -243,7 +243,7 @@
             </Grid>
         </Grid>
         <!-- End of lgridMain -->
-        <Grid Name="lgridFilenameGenerate" >
+        <Grid Name="lgridFilenameGenerate" Visibility="Collapsed" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
@@ -627,13 +627,14 @@
             <TextBox Name="txtFileGenSelectFilename" TextWrapping="Wrap" Grid.Row="2" />
             <Button Content="キャンセル" Name="btnSelectCancel" FontSize="24" Height="40" Width="200" Margin="5,5,5,5" HorizontalAlignment="Center" Grid.Row="3" Click="btnSelectCancel_Click" />
         </Grid>
-        <Grid Name="lgridKoreanPornoArrange" Visibility="Collapsed" >
+        <Grid Name="lgridKoreanPornoArrange" Visibility="Visible" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
@@ -648,6 +649,7 @@
                         <Binding Path="KoreanPornoPath" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <local:TextBoxFilePathRule />
+                                
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox.Text>
@@ -662,7 +664,18 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <!--<TextBox Name="txtKoreanPornoStorePath" Margin="5,3,5,3"  FontSize="18" TextWrapping="Wrap" Grid.Column="1" TextChanged="txtKoreanPornoStorePath_TextChanged" />-->
+                <WrapPanel Orientation="Horizontal" Grid.ColumnSpan="2" Grid.Row="2">
+                    <TextBox Name="txtKoreanPornoExportStorePath"  Validation.ErrorTemplate="{StaticResource TextBoxErrorTemplate}" MinWidth="300" Margin="5,3,5,3"  FontSize="18" TextWrapping="Wrap">
+                        <TextBox.Text>
+                            <Binding Path="KoreanPornoExportStorePath" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:TextBoxStorePathRule />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <Button Name="btnKoreanPornoExportStorePath" Content="作成" Width="80" Margin="5,3,5,3" HorizontalAlignment="Right" Click="MakeStorePath" />
+                </WrapPanel>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
@@ -738,11 +751,6 @@
                 <Button Name="btnKoreanPornoExecute" Content="実行" Width="250" Height="50" Margin="5,3,5,3" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="2" Grid.Row="3" Click="btnKoreanPornoExecute_Click" />
             </Grid>
             <DataGrid Name="dgridKoreanPorno" Width="Auto" Margin="10,3,10,10" AutoGenerateColumns="False" CanUserAddRows="False" Grid.Row="1" MouseDoubleClick="dgridKoreanPorno_MouseDoubleClick" SelectionChanged="dgridKoreanPorno_SelectionChanged" >
-                <DataGrid.ItemContainerStyle>
-                    <Style TargetType="DataGridRow">
-                        <Setter Property="Background" Value="{Binding Status, Converter={StaticResource rowColorConverterKoreanPorno}}" />
-                    </Style>
-                </DataGrid.ItemContainerStyle>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="ファイル名" Width="500">
                         <DataGridTemplateColumn.CellTemplate>

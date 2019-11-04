@@ -396,7 +396,7 @@ namespace WpfScrapingArrangement.service
                         data.FileId = MysqlExportCommon.GetDbInt(reader, 17);
                         data.Rating = MysqlExportCommon.GetDbInt(reader, 18);
                         data.JavPostDate = MysqlExportCommon.GetDbDateTime(reader, 19);
-                        data.Size = MysqlExportCommon.GetDbInt(reader, 20);
+                        data.Size = MysqlExportCommon.GetDbLong(reader, 20);
                         data.Package = MysqlExportCommon.GetDbString(reader, 21);
                         data.Thumbnail = MysqlExportCommon.GetDbString(reader, 22);
                         data.DownloadFiles = MysqlExportCommon.GetDbString(reader, 23);

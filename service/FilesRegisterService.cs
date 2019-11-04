@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.VisualBasic.FileIO;
 using MySql.Data.MySqlClient;
+using WpfScrapingArrangement.data;
 
 namespace WpfScrapingArrangement.service
 {
@@ -132,13 +133,17 @@ namespace WpfScrapingArrangement.service
             }
         }
 
-        public void SetDbMovieFilesInfo(MovieImportData myImportData)
+        public void SetDbMovieFilesInfo(MovieImportData myImportData, StoreData myStoreData)
         {
+            if (myStoreData == null)
+                throw new Exception("使われる想定のないメソッドが使用された、StoreDataを設定して下さい");
+
             targetImportData = myImportData;
             targetFileContentsData = new MovieFileContents();
 
             targetFileContentsData.Name = DestFilename;
             targetFileContentsData.Label = LabelPath;
+            targetFileContentsData.StoreLabel = myStoreData.Label;
 
             if (listExtension == null)
                 return;
@@ -193,11 +198,12 @@ namespace WpfScrapingArrangement.service
         {
             try
             {
+                // Mysqlのcontentsへ登録
+                DbExportContents();
+
+                // SQL ServerのMOVIE_FILESへ登録
                 dbcon.BeginTransaction("MOVIE_REGISTER");
-
-                // データベースへ登録
                 DbExportMovieFiles();
-
                 dbcon.CommitTransaction();
 
                 // MOVIE_IMPORTから削除
@@ -398,6 +404,72 @@ namespace WpfScrapingArrangement.service
             sqlparams[9].Value = targetFileContentsData.Rating;
 
             dbcon.SetParameter(sqlparams);
+            dbcon.execSqlCommand(sqlCommand);
+        }
+
+        public void DbExportContents()
+        {
+            MySqlDbConnection dbcon = new MySqlDbConnection();
+
+            // データベースへ登録
+            string sqlCommand = "INSERT INTO av.contents (store_label, name, product_number, extension, tag, publish_date, file_date, file_count, size, rating, file_status) "
+                + "VALUES( @pStoreLabel, @pName, @pProductNumber, @pExtension, @pTag, @pPublishDate, @pFileDate, @pFileCount, @pSize, @Rating, @pFileStatus )";
+
+            MySqlCommand command = new MySqlCommand(sqlCommand, dbcon.getMySqlConnection());
+
+            List<MySqlParameter> listParams = new List<MySqlParameter>();
+
+            MySqlParameter param = new MySqlParameter("@pStoreLabel", MySqlDbType.VarChar);
+            param.Value = targetImportData.StoreLabel;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pName", MySqlDbType.VarChar);
+            param.Value = targetFileContentsData.Name;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pProductNumber", MySqlDbType.VarChar);
+            param.Value = targetFileContentsData.ProductNumber;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pExtension", MySqlDbType.VarChar);
+            param.Value = targetFileContentsData.Extension;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pTag", MySqlDbType.VarChar);
+            param.Value = targetFileContentsData.Tag;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pPublishDate", MySqlDbType.DateTime);
+            if (targetFileContentsData.SellDate.Year >= 2000)
+                param.Value = targetFileContentsData.SellDate;
+            else
+                param.Value = Convert.DBNull;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pFileDate", MySqlDbType.DateTime);
+            if (targetFileContentsData.FileDate.Year >= 2000)
+                param.Value = targetFileContentsData.FileDate;
+            else
+                param.Value = Convert.DBNull;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pFileCount", MySqlDbType.Int32);
+            param.Value = targetFileContentsData.FileCount;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pSize", MySqlDbType.Decimal);
+            param.Value = targetFileContentsData.Size;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@Rating", MySqlDbType.Int32);
+            param.Value = targetFileContentsData.Rating;
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pFileStatus", MySqlDbType.VarChar);
+            param.Value = "exist";
+            listParams.Add(param);
+
+            dbcon.SetParameter(listParams.ToArray());
             dbcon.execSqlCommand(sqlCommand);
         }
 

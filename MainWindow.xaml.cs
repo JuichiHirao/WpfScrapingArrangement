@@ -45,6 +45,7 @@ namespace WpfScrapingArrangement
         private FileGeneTargetFilesCollection ColViewDestFiles; // dgridDestFile
         private MakerCollection ColViewMaker;
         private KoreanPornoCollection ColViewKoreanPorno;
+        private StoreCollection ColViewStore;
 
         private List<ReplaceInfoData> dispctrlListReplaceInfoActress;
 
@@ -147,6 +148,22 @@ namespace WpfScrapingArrangement
                 }
             }
 
+            private string _koreanPornoExportStorePath;
+
+            public string KoreanPornoExportStorePath
+            {
+                get { return this._koreanPornoExportStorePath; }
+                set
+                {
+                    this._koreanPornoExportStorePath = value;
+                    var handler = this.PropertyChanged;
+                    if (handler != null)
+                    {
+                        handler(this, new PropertyChangedEventArgs("KoreanPornoExportStorePath"));
+                    }
+                }
+            }
+
             private string _FilenameGenDate;
 
             public string FilenameGenDate
@@ -241,6 +258,7 @@ namespace WpfScrapingArrangement
             ColViewDestFiles = new collection.FileGeneTargetFilesCollection(txtBasePath.Text);
             ColViewKoreanPorno = new collection.KoreanPornoCollection(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text);
             ColViewMovieImport = new MovieImportCollection();
+            ColViewStore = new StoreCollection();
 
             ColViewMovieFileContents = new collection.MovieFileContentsCollection();
 
@@ -789,7 +807,7 @@ namespace WpfScrapingArrangement
                     service.SetMovieActionInfo();
 
                     // データベースへ登録用の情報を生成する
-                    service.SetDbMovieFilesInfo(dispinfoSelectMovieImportData);
+                    service.SetDbMovieFilesInfo(dispinfoSelectMovieImportData, null);
 
                     service.DbExport();
 
@@ -1826,10 +1844,12 @@ namespace WpfScrapingArrangement
             {
                 List<KoreanPornoFileInfo> fileList = (List<KoreanPornoFileInfo>)dgridKoreanPornoFolder.ItemsSource;
 
+                Regex regexImage = new Regex(FileGeneTargetFilesCollection.REGEX_IMAGE_EXTENTION, RegexOptions.IgnoreCase);
+
                 int movieCount = 0;
                 foreach (KoreanPornoFileInfo data in fileList)
                 {
-                    if (data.IsSelected && data.FileInfo.Extension == ".jpg")
+                    if (data.IsSelected && regexImage.IsMatch(data.FileInfo.Name))
                         continue;
                     else if (data.IsSelected)
                         movieCount++;
@@ -1849,9 +1869,10 @@ namespace WpfScrapingArrangement
                 selData.CopyText = TxtKoreanPornoName.Text;
                 selData.ProductNumber = TxtKoreanPornoArchiveFile.Text;
                 selData.Tag = TxtKoreanPornoTag.Text;
+                StoreData storeData = ColViewStore.GetMatchByPath(txtKoreanPornoExportPath.Text);
 
                 KoreanPornoService service = new KoreanPornoService(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text, ChkKoreanPornoMoveFolder.IsChecked);
-                service.ExecuteArrangement(selData, (List<KoreanPornoFileInfo>)dgridKoreanPornoFolder.ItemsSource);
+                service.ExecuteArrangement(selData, storeData, (List<KoreanPornoFileInfo>)dgridKoreanPornoFolder.ItemsSource);
 
                 ColViewKoreanPorno.Delete(dispinfoSelectDataGridKoreanPorno);
                 ChkKoreanPornoMoveFolder.IsChecked = false;
@@ -1881,6 +1902,23 @@ namespace WpfScrapingArrangement
                 txtKoreanPornoExportPath.Text = ClipBoardCommon.GetTextPath();
             else
                 txtKoreanPornoPath.Text = ClipBoardCommon.GetTextPath();
+        }
+
+        private void MakeStorePath(object sender, RoutedEventArgs e)
+        {
+            if (Validation.GetHasError(txtKoreanPornoExportPath))
+                return;
+
+            //if (Validation.GetHasError(txtKoreanPornoExportStorePath))
+            //    return;
+
+            StoreData storeData = new StoreData();
+            storeData.Label = txtKoreanPornoExportStorePath.Text;
+            storeData.Name1 = txtKoreanPornoExportStorePath.Text;
+            storeData.Path = txtKoreanPornoExportPath.Text;
+            storeData.Type = "file";
+
+            ColViewStore.Add(storeData);
         }
 
         private void OnMakersFilter(object sender, RoutedEventArgs e)
@@ -2081,12 +2119,15 @@ namespace WpfScrapingArrangement
                 return;
             }
 
-            // 動画のファイル名変更
-
             FilesRegisterService service = new FilesRegisterService(new DbConnection());
 
+            // 動画のファイル名変更
+            StoreData storeData = null;
             try
             {
+                storeData = ColViewStore.GetMatchByPath(txtLabelPath.Text);
+                dispinfoSelectMovieImportData.StoreLabel = storeData.Label;
+
                 service.BasePath = txtBasePath.Text;
                 service.DestFilename = txtFilenameGenerate.Text;
                 service.LabelPath = txtLabelPath.Text;
@@ -2109,7 +2150,7 @@ namespace WpfScrapingArrangement
                 string thumbnailDest = Path.Combine(txtBasePath.Text, txtFilenameGenerate.Text + "_th" + jpegExtension);
 
                 // データベースへ登録用の情報を生成、登録
-                service.SetDbMovieFilesInfo(dispinfoSelectMovieImportData);
+                service.SetDbMovieFilesInfo(dispinfoSelectMovieImportData, storeData);
                 service.DbExport();
 
                 // パッケージ画像のコピー

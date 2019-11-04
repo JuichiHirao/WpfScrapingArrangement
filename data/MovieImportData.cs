@@ -38,6 +38,8 @@ namespace WpfScrapingArrangement
 
         public int Id { get; set; }
 
+        public string StoreLabel { get; set; }
+
         public int FileId { get; set; }
 
         public string CopyText { get; set; }

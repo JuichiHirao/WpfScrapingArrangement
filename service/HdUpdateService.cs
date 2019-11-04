@@ -103,7 +103,7 @@ namespace WpfScrapingArrangement.service
 
                     FilesRegisterService serviceFileRegister = new FilesRegisterService(dbcon);
                     serviceFileRegister.BasePath = BasePath;
-                    serviceFileRegister.SetDbMovieFilesInfo(myImportData);
+                    serviceFileRegister.SetDbMovieFilesInfo(myImportData, null);
                     serviceFileRegister.DeleteFiles(delTargetList);
                 }
                 myFileContents.Extension = ext;

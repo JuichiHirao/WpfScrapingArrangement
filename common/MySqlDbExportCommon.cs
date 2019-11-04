@@ -1,14 +1,14 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
 
-namespace WpfScrapingArrangement
+namespace WpfScrapingArrangement.common
 {
-    class MysqlExportCommon
+    class MySqlDbExportCommon
     {
         public static string GetDbString(MySqlDataReader myReader, int myColumnNo)
         {
@@ -24,21 +24,6 @@ namespace WpfScrapingArrangement
             }
             return myData;
         }
-        public static long GetDbLong(MySqlDataReader myReader, int myColumnNo)
-        {
-            long myData = 0;
-            try
-            {
-                if (!myReader.IsDBNull(myColumnNo))
-                    myData = myReader.GetInt64(myColumnNo);
-            }
-            catch (Exception)
-            {
-                myData = 0;
-            }
-            return myData;
-        }
-
         public static int GetDbInt(MySqlDataReader myReader, int myColumnNo)
         {
             int myData = 0;
@@ -107,5 +92,6 @@ namespace WpfScrapingArrangement
             }
             return myData;
         }
+
     }
 }
