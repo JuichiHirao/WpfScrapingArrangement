@@ -37,7 +37,35 @@ namespace WpfScrapingArrangement.service
 
             string pathname = System.IO.Path.Combine(BasePath, myArchiveName);
 
-            if (!Directory.Exists(pathname) && !File.Exists(pathname))
+            //if (!Directory.Exists(pathname) && !File.Exists(pathname))
+            //    return null;
+
+            string[] archiveMovieFiles = null;
+            bool isExist = false;
+            Regex regexMovie = new Regex(FileGeneTargetFilesCollection.REGEX_MOVIEONLY_EXTENTION, RegexOptions.IgnoreCase);
+            string oneFilename = "";
+            if (!Directory.Exists(pathname))
+            {
+                archiveMovieFiles = Directory.GetFiles(BasePath, myArchiveName + "*");
+                if (archiveMovieFiles.Length > 0)
+                    foreach (string file in archiveMovieFiles)
+                    {
+                        if (regexMovie.IsMatch(file))
+                        {
+                            oneFilename = file;
+                            isExist = true;
+                            break;
+                        }
+                    }
+
+                if (File.Exists(pathname))
+                    isExist = true;
+
+            }
+            else
+                isExist = true;
+
+            if (isExist == false)
                 return null;
 
             Regex regexImage = new Regex(FileGeneTargetFilesCollection.REGEX_IMAGE_EXTENTION, RegexOptions.IgnoreCase);
@@ -81,7 +109,10 @@ namespace WpfScrapingArrangement.service
             else
             {
                 files = new string[1];
-                files[0] = pathname;
+                if (oneFilename.Length > 0)
+                    files[0] = oneFilename;
+                else
+                    files[0] = pathname;
             }
 
             Regex regex = new Regex(FileGeneTargetFilesCollection.REGEX_MOVIE_EXTENTION, RegexOptions.IgnoreCase);
