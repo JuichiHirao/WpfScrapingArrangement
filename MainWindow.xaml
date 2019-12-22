@@ -243,7 +243,7 @@
             </Grid>
         </Grid>
         <!-- End of lgridMain -->
-        <Grid Name="lgridFilenameGenerate" Visibility="Collapsed" >
+        <Grid Name="lgridFilenameGenerate" Visibility="Visible" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
@@ -278,6 +278,7 @@
                     </ComboBox>
                     <Button Name="btnRefrectActress" Content="Ac反映" Margin="5,5,5,5" Click="btnRefrectActress_Click" />
                     <Button Name="btnJumpUrl" Content="URL" Margin="5,5,5,5" Click="btnJumpUrl_Click" />
+                    <TextBlock Name="txtbTotalSize" Margin="5,5,5,5" FontSize="24" />
                 </WrapPanel>
                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.ColumnSpan="3" Grid.Row="1" Height="40">
                     <TextBlock Name="txtbPostDate" Margin="5,5,5,5" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="12" />
@@ -374,7 +375,10 @@
                 <Grid Margin="5,3,5,3" VerticalAlignment="Bottom" Grid.Row="3">
                     <WrapPanel Orientation="Horizontal">
                         <Button Name="btnPasteActresses" Content="Ac貼付" Width="70" Margin="5,0,5,0" HorizontalAlignment="Left" Click="btnPasteActresses_Click" />
-                        <TextBox Name="txtTag" Margin="5,3,5,3" Grid.Column="1" TextWrapping="Wrap" />
+                        <TextBox Name="txtTag" Margin="5,3,5,3" TextWrapping="Wrap" />
+                        <Button Name="btnPasteActressesClear" Content="Clear" Width="50" Margin="20,5,5,5" HorizontalAlignment="Left" Click="btnPasteActressesClear_Click" />
+                        <Button Name="btnPasteActressesSearch" Content="検索" Width="50" Margin="5,5,5,5" HorizontalAlignment="Left" Click="btnPasteActressesSearch_Click"/>
+                        <TextBlock Name="txtResultRating" Margin="5,3,5,3" TextWrapping="Wrap" />
                     </WrapPanel>
                 </Grid>
                 <Grid Grid.Row="4">
@@ -627,7 +631,7 @@
             <TextBox Name="txtFileGenSelectFilename" TextWrapping="Wrap" Grid.Row="2" />
             <Button Content="キャンセル" Name="btnSelectCancel" FontSize="24" Height="40" Width="200" Margin="5,5,5,5" HorizontalAlignment="Center" Grid.Row="3" Click="btnSelectCancel_Click" />
         </Grid>
-        <Grid Name="lgridKoreanPornoArrange" Visibility="Visible" >
+        <Grid Name="lgridKoreanPornoArrange" Visibility="Collapsed" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />

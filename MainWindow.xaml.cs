@@ -282,6 +282,19 @@ namespace WpfScrapingArrangement
             ReplaceInfoService serviceReplaceInfo = new ReplaceInfoService();
             dispctrlListReplaceInfoActress = serviceReplaceInfo.GetTypeAll(data.ReplaceInfoData.EnumType.actress, new MySqlDbConnection());
 
+            AvContentsService serviceContent = new AvContentsService();
+            StoreData storeData = ColViewStore.GetMatchByPath(txtLabelPath.Text);
+            long totalSize = serviceContent.GetStoreLabelTotalSize(storeData.Label, new MySqlDbConnection());
+            long size = totalSize / 1024 / 1024 / 1024;
+            string DisplaySize = "";
+            if (size > 1023)
+                DisplaySize = String.Format("{0}G", Convert.ToInt32(size));
+            else
+            {
+                size = totalSize / 1024 / 1024 / 1024;
+                DisplaySize = String.Format("{0:##.##}T", Convert.ToDouble(size));
+            }
+            txtbTotalSize.Text = DisplaySize;
         }
 
         /// <summary>
@@ -1055,6 +1068,7 @@ namespace WpfScrapingArrangement
                 }
 
                 SetUIElementFromImportData(dispinfoSelectMovieImportData);
+                btnPasteActressesSearch_Click(null, null);
 
                 foreach (TargetFiles file in ColViewFileGeneTargetFiles.ColViewListTargetFiles)
                 {
@@ -2212,6 +2226,23 @@ namespace WpfScrapingArrangement
 
             if (selData != null)
                 txtTag.Text = selData.Name;
+        }
+
+        private void btnPasteActressesClear_Click(object sender, RoutedEventArgs e)
+        {
+            txtTag.Text = "";
+        }
+
+        private void btnPasteActressesSearch_Click(object sender, RoutedEventArgs e)
+        {
+            if (txtTag.Text.Length <= 0)
+            {
+                txtResultRating.Text = "";
+                return;
+            }
+
+            AvContentsService contentsService = new AvContentsService();
+            txtResultRating.Text = contentsService.GetActressRating(txtTag.Text, new MySqlDbConnection());
         }
     }
 }

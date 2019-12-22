@@ -85,6 +85,7 @@
     <Compile Include="collection\StoreCollection.cs" />
     <Compile Include="common\CommonMethod.cs" />
     <Compile Include="common\MySqlDbExportCommon.cs" />
+    <Compile Include="data\AvContentsData.cs" />
     <Compile Include="data\KoreanPornoData.cs" />
     <Compile Include="data\KoreanPornoFileInfo.cs" />
     <Compile Include="data\MovieImportData.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="data\StoreData.cs" />
     <Compile Include="DynamicJson.cs" />
     <Compile Include="RowColorConverterKoreanPorno.cs" />
+    <Compile Include="service\AvContentsService.cs" />
     <Compile Include="service\DateCopyService.cs" />
     <Compile Include="service\FilesRegisterService.cs" />
     <Compile Include="service\HdUpdateService.cs" />

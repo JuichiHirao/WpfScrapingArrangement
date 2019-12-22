@@ -357,7 +357,7 @@ namespace WpfScrapingArrangement.service
 
             sqlcmd = "SELECT ID, copy_text, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, sell_date, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, CREATED_AT, UPDATED_AT, HD_KIND, movie_file_id, RATING, JAV_POST_DATE, SIZE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, SEARCH_RESULT, DETAIL ";
             sqlcmd = sqlcmd + "FROM import ";
-            sqlcmd = sqlcmd + "ORDER BY CREATED_AT ";
+            sqlcmd = sqlcmd + "ORDER BY JAV_POST_DATE ";
 
             MySqlDataReader reader = null;
             try
