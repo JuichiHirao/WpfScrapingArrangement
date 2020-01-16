@@ -22,6 +22,7 @@ using Codeplex.Data;
 using WpfScrapingArrangement.service;
 using WpfScrapingArrangement.collection;
 using WpfScrapingArrangement.data;
+using WpfScrapingArrangement.common;
 
 namespace WpfScrapingArrangement
 {
@@ -36,6 +37,8 @@ namespace WpfScrapingArrangement
         public readonly static RoutedCommand ChangeModeDateCopy = new RoutedCommand("ChangeModeDateCopy", typeof(MainWindow));
         public readonly static RoutedCommand CahngeModeFilenameGenerate = new RoutedCommand("CahngeModeFilenameGenerate", typeof(MainWindow));
         public readonly static RoutedCommand CahngeModeKoreanPorno = new RoutedCommand("CahngeModeKoreanPorno", typeof(MainWindow));
+
+        private MySqlDbConnection dockerMysqlConn = null;
 
         private MovieFileContentsCollection ColViewMovieFileContents;
 
@@ -234,6 +237,9 @@ namespace WpfScrapingArrangement
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            dockerMysqlConn = new MySqlDbConnection(MySqlDbConnection.DockerDatabase, MySqlDbConnection.DockerDataSource
+                , MySqlDbConnection.DockerPort, MySqlDbConnection.DockerUser, MySqlDbConnection.DockerPassword);
+
             settingControl = new SettingXmlControl();
             setting = settingControl.GetData();
 
@@ -283,18 +289,25 @@ namespace WpfScrapingArrangement
             dispctrlListReplaceInfoActress = serviceReplaceInfo.GetTypeAll(data.ReplaceInfoData.EnumType.actress, new MySqlDbConnection());
 
             AvContentsService serviceContent = new AvContentsService();
-            StoreData storeData = ColViewStore.GetMatchByPath(txtLabelPath.Text);
-            long totalSize = serviceContent.GetStoreLabelTotalSize(storeData.Label, new MySqlDbConnection());
-            long size = totalSize / 1024 / 1024 / 1024;
-            string DisplaySize = "";
-            if (size > 1023)
-                DisplaySize = String.Format("{0}G", Convert.ToInt32(size));
-            else
+            try
             {
-                size = totalSize / 1024 / 1024 / 1024;
-                DisplaySize = String.Format("{0:##.##}T", Convert.ToDouble(size));
+                StoreData storeData = ColViewStore.GetMatchByPath(txtLabelPath.Text);
+                long totalSize = serviceContent.GetStoreLabelTotalSize(storeData.Label, dockerMysqlConn);
+                long size = totalSize / 1024 / 1024 / 1024;
+                string DisplaySize = "";
+                if (size < 1024)
+                    DisplaySize = String.Format("{0}G", Convert.ToInt32(size));
+                else
+                {
+                    size = totalSize / 1024 / 1024 / 1024;
+                    DisplaySize = String.Format("{0:##.##}T", Convert.ToDouble(size));
+                }
+                txtbTotalSize.Text = DisplaySize;
             }
-            txtbTotalSize.Text = DisplaySize;
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         /// <summary>
@@ -1744,7 +1757,10 @@ namespace WpfScrapingArrangement
         {
             string ClipboardText = ClipBoardCommon.GetText();
 
-            txtTag.Text = dispinfoSelectMovieImportData.ConvertActress(ClipboardText, ",");
+            if (dispinfoSelectMovieImportData == null)
+                txtTag.Text = ClipboardText;
+            else
+                txtTag.Text = dispinfoSelectMovieImportData.ConvertActress(ClipboardText, ",");
 
             string message = "";
             foreach(ReplaceInfoData replaceInfoData in dispctrlListReplaceInfoActress)
@@ -2241,8 +2257,11 @@ namespace WpfScrapingArrangement
                 return;
             }
 
+            if (dockerMysqlConn == null)
+                return;
+
             AvContentsService contentsService = new AvContentsService();
-            txtResultRating.Text = contentsService.GetActressRating(txtTag.Text, new MySqlDbConnection());
+            txtResultRating.Text = Actress.GetEvaluation(txtTag.Text, contentsService, dockerMysqlConn);
         }
     }
 }

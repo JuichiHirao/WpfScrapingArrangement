@@ -9,16 +9,32 @@ using System.Xml.Linq;
 using Codeplex.Data;
 using Microsoft.CSharp.RuntimeBinder;
 using MySql.Data.MySqlClient;
+using NLog;
 
 namespace WpfScrapingArrangement
 {
     public class MySqlDbConnection
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+
         string settings;
         private MySqlConnection dbcon = null;
         private MySqlTransaction dbtrans = null;
 
         private MySqlParameter[] parameters;
+
+        // "av", "127.0.0.1", "43306", "root", "mysql"
+        public static string DockerDatabase = "av";
+        public static string DockerDataSource = "127.0.0.1";
+        public static string DockerPort = "43306";
+        public static string DockerUser = "root";
+        public static string DockerPassword = "mysql";
+
+        public MySqlDbConnection(string myDatabase, string myDataSource, string myPort, string myUser, string myPassword)
+        {
+            String connectionInfo = "Database=" + myDatabase + "; Data Source=" + myDataSource + "; port=" + myPort + "; User Id=" + myUser + "; Password=" + myPassword + "; ConnectionTimeout=600; DefaultCommandTimeout=600";
+            dbcon = new MySqlConnection(connectionInfo);
+        }
 
         public MySqlDbConnection()
         {
@@ -30,7 +46,7 @@ namespace WpfScrapingArrangement
             }
             string json = File.ReadAllText("credential.json");
             var obj = DynamicJson.Parse(json);
-            string database = "", datasource = "", user = "", password = "";
+            string database = "", datasource = "", user = "", password = "", port = "";
             try
             {
                 var targetObj = obj[target];
@@ -44,10 +60,22 @@ namespace WpfScrapingArrangement
             {
                 throw new Exception("credential.jsonに存在しない[" + target + "]が指定されました or " + ex.Message);
             }
+            try
+            {
+                var targetObj = obj[target];
 
-            String connectionInfo = "Database=" + database + "; Data Source=" + datasource + ";User Id=" + user + "; Password=" + password;
+                port = targetObj.port;
+            }
+            catch (RuntimeBinderException ex)
+            {
+                _logger.Warn("portの設定がされていないので、初期3306を使用します");
+                port = "3306";
+            }
+
+            String connectionInfo = "Database=" + database + "; Data Source=" + datasource + "; port=" + port + "; User Id=" + user + "; Password=" + password + "; ConnectionTimeout=600; DefaultCommandTimeout=600";
             dbcon = new MySqlConnection(connectionInfo);
         }
+
         ~MySqlDbConnection()
         {
             try

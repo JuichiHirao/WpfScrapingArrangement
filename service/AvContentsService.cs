@@ -12,10 +12,72 @@ namespace WpfScrapingArrangement.service
 {
     class AvContentsService
     {
+        public string[] GetFavoriteActresses(string myActress, MySqlDbConnection myDbCon)
+        {
+            if (myDbCon == null)
+                // string myDatabase, string myDataSource, string myPort, string myUser, string myPassword
+                myDbCon = new MySqlDbConnection(MySqlDbConnection.DockerDatabase, MySqlDbConnection.DockerDataSource
+                    , MySqlDbConnection.DockerPort, MySqlDbConnection.DockerUser, MySqlDbConnection.DockerPassword);
+
+            List<string> actressList = new List<string>();
+            string queryString = "SELECT label, name FROM av.fav WHERE label = @StoreLabel or name like @LikeName ";
+
+            string labels = "";
+            try
+            {
+                List<MySqlParameter> listSqlParam = new List<MySqlParameter>();
+                MySqlDataReader reader = null;
+
+                MySqlParameter sqlparam = new MySqlParameter("@StoreLabel", MySqlDbType.VarChar);
+                sqlparam.Value = myActress;
+                listSqlParam.Add(sqlparam);
+
+                sqlparam = new MySqlParameter("@LikeName", MySqlDbType.VarChar);
+                sqlparam.Value = "%" + myActress + "%";
+                listSqlParam.Add(sqlparam);
+
+                myDbCon.SetParameter(listSqlParam.ToArray());
+                reader = myDbCon.GetExecuteReader(queryString);
+
+                string label = "", name = "";
+                do
+                {
+                    if (reader.IsClosed)
+                    {
+                        //_logger.Debug("av.contents reader.IsClosed");
+                        throw new Exception("av.contentsの取得でreaderがクローズされています");
+                    }
+
+                    while (reader.Read())
+                    {
+                        label = MySqlDbExportCommon.GetDbString(reader, 0);
+                        name = MySqlDbExportCommon.GetDbString(reader, 1);
+                        if (label.IndexOf(myActress) >= 0)
+                            actressList.AddRange(Actress.AppendMatch(label, actressList));
+
+                        if (name.IndexOf(myActress) >= 0)
+                            actressList.AddRange(Actress.AppendMatch(name, actressList));
+                    }
+
+                } while (reader.NextResult());
+            }
+            catch (Exception ex)
+            {
+                Debug.Write(ex);
+            }
+            //Debug.Print("totalsize " + total);
+
+            myDbCon.closeConnection();
+
+            return actressList.ToArray();
+        }
+
         public long GetStoreLabelTotalSize(string myStoreLabel, MySqlDbConnection myDbCon)
         {
             if (myDbCon == null)
-                myDbCon = new MySqlDbConnection();
+                // string myDatabase, string myDataSource, string myPort, string myUser, string myPassword
+                myDbCon = new MySqlDbConnection(MySqlDbConnection.DockerDatabase, MySqlDbConnection.DockerDataSource
+                    , MySqlDbConnection.DockerPort, MySqlDbConnection.DockerUser, MySqlDbConnection.DockerPassword);
 
             string queryString = "SELECT sum(size) FROM av.v_contents WHERE store_label = @StoreLabel ";
 
@@ -42,25 +104,76 @@ namespace WpfScrapingArrangement.service
             return total;
         }
 
-        public string GetActressRating(string myTag, MySqlDbConnection myDbCon)
+        public List<AvContentsData> GetActressList(string myTag, MySqlDbConnection myDbCon)
         {
-            if (myDbCon == null)
-                myDbCon = new MySqlDbConnection();
-
-            List<AvContentsData> listMContents = new List<AvContentsData>();
-            string queryString = "SELECT tag, rating FROM av.v_contents WHERE tag like @Tag ";
+            List<AvContentsData> avContentsList = new List<AvContentsData>();
+            string queryString = "SELECT id, tag, rating FROM av.contents WHERE tag like @Tag ";
 
             MySqlDataReader reader = null;
-            int total = 0;
-            int activeTotal = 0;
-            int rating = 0;
-            int maxRating = 0;
+            string[] arrTag = myTag.Split(',');
+
+            try
+            {
+                foreach (string tag in arrTag)
+                {
+                    List<MySqlParameter> listSqlParam = new List<MySqlParameter>();
+
+                    MySqlParameter sqlparam = new MySqlParameter("@Tag", MySqlDbType.VarChar);
+                    sqlparam.Value = String.Format("{0}", tag);
+                    listSqlParam.Add(sqlparam);
+                    myDbCon.SetParameter(listSqlParam.ToArray());
+
+                    reader = myDbCon.GetExecuteReader(queryString);
+
+                    do
+                    {
+                        myDbCon.SetParameter(listSqlParam.ToArray());
+
+                        if (reader.IsClosed)
+                        {
+                            //_logger.Debug("av.contents reader.IsClosed");
+                            throw new Exception("av.contentsの取得でreaderがクローズされています");
+                        }
+
+                        while (reader.Read())
+                        {
+                            AvContentsData data = new AvContentsData();
+
+                            data.Id = MySqlDbExportCommon.GetDbInt(reader, 0);
+                            data.Tag = MySqlDbExportCommon.GetDbString(reader, 1);
+                            data.Rating = MySqlDbExportCommon.GetDbInt(reader, 2);
+
+                            avContentsList.Add(data);
+                        }
+                    } while (reader.NextResult());
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Write(ex);
+            }
+            finally
+            {
+                if (reader != null) reader.Close();
+            }
+
+            myDbCon.closeConnection();
+
+            return avContentsList;
+        }
+
+        public List<AvContentsData> GetActressLikeFilenameList(string myActress, MySqlDbConnection myDbCon, List<AvContentsData> myExistList)
+        {
+            List<AvContentsData> avContentsList = new List<AvContentsData>();
+            string queryString = "SELECT id, tag, rating FROM av.v_contents WHERE name like @Tag ";
+
+            MySqlDataReader reader = null;
             try
             {
                 List<MySqlParameter> listSqlParam = new List<MySqlParameter>();
 
                 MySqlParameter sqlparam = new MySqlParameter("@Tag", MySqlDbType.VarChar);
-                sqlparam.Value = String.Format("{0}", myTag);
+                sqlparam.Value = String.Format("{0}", myActress);
                 listSqlParam.Add(sqlparam);
                 myDbCon.SetParameter(listSqlParam.ToArray());
 
@@ -80,16 +193,14 @@ namespace WpfScrapingArrangement.service
                     {
                         AvContentsData data = new AvContentsData();
 
-                        data.Tag = MySqlDbExportCommon.GetDbString(reader, 0);
-                        data.Rating = MySqlDbExportCommon.GetDbInt(reader, 1);
+                        data.Id = MySqlDbExportCommon.GetDbInt(reader, 0);
+                        data.Tag = MySqlDbExportCommon.GetDbString(reader, 1);
+                        data.Rating = MySqlDbExportCommon.GetDbInt(reader, 2);
 
-                        if (data.Rating > 0)
-                            activeTotal++;
-
-                        if (maxRating < data.Rating)
-                            maxRating = data.Rating;
-
-                        total++;
+                        if (myExistList == null)
+                            avContentsList.Add(data);
+                        else if (!myExistList.Exists(x => x.Id == data.Id))
+                            avContentsList.Add(data);
                     }
                 } while (reader.NextResult());
             }
@@ -104,7 +215,7 @@ namespace WpfScrapingArrangement.service
 
             myDbCon.closeConnection();
 
-            return String.Format("max{0} 済{1}/全{2}", maxRating, activeTotal, total);
+            return avContentsList;
         }
 
     }
