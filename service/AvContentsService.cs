@@ -23,48 +23,43 @@ namespace WpfScrapingArrangement.service
             string queryString = "SELECT label, name FROM av.fav WHERE label = @StoreLabel or name like @LikeName ";
 
             string labels = "";
-            try
+
+            List<MySqlParameter> listSqlParam = new List<MySqlParameter>();
+            MySqlDataReader reader = null;
+
+            MySqlParameter sqlparam = new MySqlParameter("@StoreLabel", MySqlDbType.VarChar);
+            sqlparam.Value = myActress;
+            listSqlParam.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@LikeName", MySqlDbType.VarChar);
+            sqlparam.Value = "%" + myActress + "%";
+            listSqlParam.Add(sqlparam);
+
+            myDbCon.SetParameter(listSqlParam.ToArray());
+            reader = myDbCon.GetExecuteReader(queryString);
+
+            string label = "", name = "";
+            do
             {
-                List<MySqlParameter> listSqlParam = new List<MySqlParameter>();
-                MySqlDataReader reader = null;
-
-                MySqlParameter sqlparam = new MySqlParameter("@StoreLabel", MySqlDbType.VarChar);
-                sqlparam.Value = myActress;
-                listSqlParam.Add(sqlparam);
-
-                sqlparam = new MySqlParameter("@LikeName", MySqlDbType.VarChar);
-                sqlparam.Value = "%" + myActress + "%";
-                listSqlParam.Add(sqlparam);
-
-                myDbCon.SetParameter(listSqlParam.ToArray());
-                reader = myDbCon.GetExecuteReader(queryString);
-
-                string label = "", name = "";
-                do
+                if (reader.IsClosed)
                 {
-                    if (reader.IsClosed)
-                    {
-                        //_logger.Debug("av.contents reader.IsClosed");
-                        throw new Exception("av.contentsの取得でreaderがクローズされています");
-                    }
+                    //_logger.Debug("av.contents reader.IsClosed");
+                    throw new Exception("av.contentsの取得でreaderがクローズされています");
+                }
 
-                    while (reader.Read())
-                    {
-                        label = MySqlDbExportCommon.GetDbString(reader, 0);
-                        name = MySqlDbExportCommon.GetDbString(reader, 1);
-                        if (label.IndexOf(myActress) >= 0)
-                            actressList.AddRange(Actress.AppendMatch(label, actressList));
+                while (reader.Read())
+                {
+                    label = MySqlDbExportCommon.GetDbString(reader, 0);
+                    name = MySqlDbExportCommon.GetDbString(reader, 1);
+                    if (label.IndexOf(myActress) >= 0)
+                        actressList.AddRange(Actress.AppendMatch(label, actressList));
 
-                        if (name.IndexOf(myActress) >= 0)
-                            actressList.AddRange(Actress.AppendMatch(name, actressList));
-                    }
+                    if (name.IndexOf(myActress) >= 0)
+                        actressList.AddRange(Actress.AppendMatch(name, actressList));
+                }
 
-                } while (reader.NextResult());
-            }
-            catch (Exception ex)
-            {
-                Debug.Write(ex);
-            }
+            } while (reader.NextResult());
+
             //Debug.Print("totalsize " + total);
 
             myDbCon.closeConnection();

@@ -23,6 +23,7 @@ using WpfScrapingArrangement.service;
 using WpfScrapingArrangement.collection;
 using WpfScrapingArrangement.data;
 using WpfScrapingArrangement.common;
+using MySql.Data.MySqlClient;
 
 namespace WpfScrapingArrangement
 {
@@ -2261,7 +2262,24 @@ namespace WpfScrapingArrangement
                 return;
 
             AvContentsService contentsService = new AvContentsService();
-            txtResultRating.Text = Actress.GetEvaluation(txtTag.Text, contentsService, dockerMysqlConn);
+
+            if (dockerMysqlConn == null)
+            {
+                txtResultRating.Text = "dockerMysqlに接続なし";
+                return;
+            }
+            try
+            {
+                txtResultRating.Text = Actress.GetEvaluation(txtTag.Text, contentsService, dockerMysqlConn);
+            }
+            catch(MySqlException emysql)
+            {
+                txtResultRating.Text = emysql.Message;
+            }
+            catch (Exception ex)
+            {
+                txtResultRating.Text = "exception " + ex.Message;
+            }
         }
     }
 }
