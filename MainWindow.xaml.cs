@@ -40,6 +40,7 @@ namespace WpfScrapingArrangement
         public readonly static RoutedCommand CahngeModeKoreanPorno = new RoutedCommand("CahngeModeKoreanPorno", typeof(MainWindow));
 
         private MySqlDbConnection dockerMysqlConn = null;
+        private MySqlDbConnection mysqlDbConn = null;
 
         private MovieFileContentsCollection ColViewMovieFileContents;
 
@@ -241,6 +242,8 @@ namespace WpfScrapingArrangement
             dockerMysqlConn = new MySqlDbConnection(MySqlDbConnection.DockerDatabase, MySqlDbConnection.DockerDataSource
                 , MySqlDbConnection.DockerPort, MySqlDbConnection.DockerUser, MySqlDbConnection.DockerPassword);
 
+            mysqlDbConn = new MySqlDbConnection();
+
             settingControl = new SettingXmlControl();
             setting = settingControl.GetData();
 
@@ -283,9 +286,6 @@ namespace WpfScrapingArrangement
             dgridSelectTargetFilename.Width = statusbarMain.ActualWidth;
             ColViewMovieImport.Refresh();
 
-            DbConnection localDbCon = new DbConnection();
-            txtbDbNowDate.Text = localDbCon.getDateStringSql("SELECT GETDATE()");
-
             ReplaceInfoService serviceReplaceInfo = new ReplaceInfoService();
             dispctrlListReplaceInfoActress = serviceReplaceInfo.GetTypeAll(data.ReplaceInfoData.EnumType.actress, new MySqlDbConnection());
 
@@ -293,7 +293,8 @@ namespace WpfScrapingArrangement
             try
             {
                 StoreData storeData = ColViewStore.GetMatchByPath(txtLabelPath.Text);
-                long totalSize = serviceContent.GetStoreLabelTotalSize(storeData.Label, dockerMysqlConn);
+                long totalSize = serviceContent.GetStoreLabelTotalSize(storeData.Label, mysqlDbConn);
+                //long totalSize = serviceContent.GetStoreLabelTotalSize(storeData.Label, dockerMysqlConn);
                 long size = totalSize / 1024 / 1024 / 1024;
                 string DisplaySize = "";
                 if (size < 1024)

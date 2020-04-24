@@ -98,15 +98,13 @@ namespace WpfScrapingArrangement.common
 
             return true;
         }
-
-        internal static string GetEvaluation(string myTag, AvContentsService contentsService, MySqlDbConnection dockerMysqlConn)
+        internal static string GetEvaluation(string[] myArrayActress, AvContentsService contentsService, MySqlDbConnection dockerMysqlConn)
         {
             bool isFav = false;
-            string[] arrActresses = common.Actress.ParseTag(myTag);
             string resultEvaluation = "", evaluation = "";
             int maxFav = 0;
             string maxActress = "";
-            foreach (string actress in arrActresses)
+            foreach (string actress in myArrayActress)
             {
                 string[] arrFavActress = contentsService.GetFavoriteActresses(actress, dockerMysqlConn);
 
@@ -141,7 +139,7 @@ namespace WpfScrapingArrangement.common
                     maxEvaluate = avContentsList.Max(x => x.Rating);
                 }
 
-                if (arrActresses.Length > 1)
+                if (myArrayActress.Length > 1)
                 {
                     if (maxFav < maxEvaluate)
                     {
@@ -155,19 +153,27 @@ namespace WpfScrapingArrangement.common
                 else
                     evaluation = String.Format("未 {0}/全 {1} Max {2} Avg {3} ({4})", unEvaluate, avContentsList.Count, maxEvaluate, sumEvaluate / (avContentsList.Count - unEvaluate), avContentsFilenameLikeList.Count);
 
-                if (arrActresses.Length > 1)
+                if (myArrayActress.Length > 1)
                     resultEvaluation = String.Format("{0} {1} {2}", resultEvaluation, actress, evaluation);
                 else
                     resultEvaluation = evaluation;
             }
 
-            if (arrActresses.Length > 1)
+            if (myArrayActress.Length > 1)
                 resultEvaluation = String.Format("【{0} Max{1}】{2}", maxActress, maxFav, resultEvaluation);
 
             if (isFav)
                 resultEvaluation = "Fav " + resultEvaluation;
 
             return resultEvaluation;
+
+        }
+
+        internal static string GetEvaluation(string myTag, AvContentsService contentsService, MySqlDbConnection dockerMysqlConn)
+        {
+            string[] arrActresses = common.Actress.ParseTag(myTag);
+
+            return Actress.GetEvaluation(arrActresses, contentsService, dockerMysqlConn);
         }
     }
 }
