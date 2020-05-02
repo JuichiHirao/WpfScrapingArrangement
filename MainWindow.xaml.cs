@@ -57,6 +57,7 @@ namespace WpfScrapingArrangement
         private List<MovieMaker> dispinfoSelectDataGridMakers = null;
         private MovieImportData dispinfoSelectDataGridKoreanPorno = null;
         private MovieImportData dispinfoSelectMovieImportData= null;
+        private MakerData dispinfoMakerData = null;
         // 日付コピー時には各DataGridがColViewではなくなるので、戻すためのフラグ
         private bool dispinfoIsDateCopyPasteExecute = false;
 
@@ -1475,6 +1476,29 @@ namespace WpfScrapingArrangement
         {
             lgridMakers.Visibility = System.Windows.Visibility.Visible;
 
+            MakerService service = new MakerService();
+            long makerId = mysqlDbConn.getLongSql("SELECT makers_id FROM jav WHERE id = " + dispinfoSelectMovieImportData.JavId);
+            dispinfoMakerData = service.GetById(makerId, mysqlDbConn);
+
+            txtRegisterMakerId.Text = dispinfoMakerData.Id.ToString();
+            txtRegisterMakerName.Text = dispinfoMakerData.Name;
+            txtRegisterMakerMatchName.Text = dispinfoMakerData.MatchName;
+            txtRegisterMakerLabel.Text = dispinfoMakerData.Label;
+            txtRegisterMakerMatchLabel.Text = dispinfoMakerData.MatchLabel;
+            txtRegisterMakerLabel.Text = dispinfoMakerData.Label;
+            txtRegisterMakerKind.Text = dispinfoMakerData.Kind.ToString();
+            txtRegisterMakerMatchStr.Text = dispinfoMakerData.MatchStr;
+            txtRegisterMakerMatchProductNumber.Text = dispinfoMakerData.MatchProductNumber;
+            txtRegisterMakerSiteKind.Text = dispinfoMakerData.SiteKind.ToString();
+            txtRegisterMakerReplaceWord.Text = dispinfoMakerData.ReplaceWord;
+            txtRegisterMakerProductNumberGenerate.Text = dispinfoMakerData.ProductNumberGenerate.ToString();
+            txtRegisterMakerInformationUrl.Text = dispinfoMakerData.InformationUrl;
+            txtRegisterMakerDeleted.Text = dispinfoMakerData.Deleted.ToString();
+            txtRegisterMakerRegisteredBy.Text = dispinfoMakerData.RegisteredBy;
+            txtRegisterMakerCreatedAt.Text = dispinfoMakerData.CreatedAt.ToString();
+            txtRegisterMakerUpdatedAt.Text = dispinfoMakerData.UpdatedAt.ToString();
+            lgridRegisterMaker.Visibility = Visibility;
+            // Debug.Print(dispinfoSelectMovieImportData.Id.ToString());
             // Autoの設定にする
             ScreenDisableBorder.Width = Double.NaN;
             ScreenDisableBorder.Height = Double.NaN;
@@ -1486,9 +1510,9 @@ namespace WpfScrapingArrangement
         {
             isSelectSameMaker = false;
 
-            if (lgridRegistMaker.Visibility == System.Windows.Visibility.Visible)
+            if (lgridRegisterMaker.Visibility == System.Windows.Visibility.Visible)
             {
-                lgridRegistMaker.Visibility = System.Windows.Visibility.Collapsed;
+                lgridRegisterMaker.Visibility = System.Windows.Visibility.Collapsed;
                 return;
             }
             if (lgridMakers.Visibility == System.Windows.Visibility.Visible)
@@ -1498,37 +1522,39 @@ namespace WpfScrapingArrangement
             }
         }
 
-        private void btnRegistMaker_Click(object sender, RoutedEventArgs e)
+        private void btnRegisterMaker_Click(object sender, RoutedEventArgs e)
         {
-            MovieMaker regdata = new MovieMaker();
-
-            regdata.Name = txtRegistMakerName.Text;
-            regdata.Label = txtRegistMakerLabel.Text;
-            regdata.Kind = Convert.ToInt32(txtRegistMakerKind.Text);
-            regdata.MatchStr = txtRegistMakerMatchStr.Text;
-            regdata.MatchProductNumber = txtRegistMatchProductNumber.Text;
-
-            if (txtRegistId.Text.Length > 0)
+            // txtRegisterMakerId.Text = data.Id.ToString();
+            try
             {
-                regdata.Id = Convert.ToInt32(txtRegistId.Text);
-                regdata.DbUpdate(null);
+                dispinfoMakerData.Name = txtRegisterMakerName.Text;
+                dispinfoMakerData.MatchName = CommonMethod.CheckRegex(txtRegisterMakerMatchName.Text);
+                dispinfoMakerData.Label = txtRegisterMakerLabel.Text;
+                dispinfoMakerData.MatchLabel = CommonMethod.CheckRegex(txtRegisterMakerMatchLabel.Text);
+                dispinfoMakerData.Kind = Convert.ToInt32(txtRegisterMakerKind.Text);
+                dispinfoMakerData.MatchStr = CommonMethod.CheckRegex(txtRegisterMakerMatchStr.Text);
+                dispinfoMakerData.MatchProductNumber = CommonMethod.CheckRegex(txtRegisterMakerMatchProductNumber.Text);
+                dispinfoMakerData.SiteKind = Convert.ToInt32(txtRegisterMakerSiteKind.Text);
+                dispinfoMakerData.ReplaceWord = txtRegisterMakerReplaceWord.Text;
+                dispinfoMakerData.ProductNumberGenerate = Convert.ToInt32(txtRegisterMakerProductNumberGenerate.Text);
+                dispinfoMakerData.ReplaceWord = txtRegisterMakerReplaceWord.Text;
+                dispinfoMakerData.InformationUrl = txtRegisterMakerInformationUrl.Text;
+                dispinfoMakerData.Deleted = Convert.ToInt32(txtRegisterMakerDeleted.Text);
+                dispinfoMakerData.RegisteredBy = txtRegisterMakerRegisteredBy.Text;
+                dispinfoMakerData.CreatedAt = Convert.ToDateTime(txtRegisterMakerCreatedAt.Text);
+                dispinfoMakerData.UpdatedAt = Convert.ToDateTime(txtRegisterMakerUpdatedAt.Text);
             }
-            else
-                regdata.DbExport(null);
+            catch(Exception ex)
+            {
+                Debug.Write(ex);
+                MessageBox.Show(ex.Message);
+                return;
+            }
 
-            lgridRegistMaker.Visibility = System.Windows.Visibility.Collapsed;
+            MakerService service = new MakerService();
 
-            dgridMakers.ItemsSource = null;
-            ColViewMaker.Refresh();
-
-            txtRegistId.Text = "";
-            txtRegistMakerName.Text = "";
-            txtRegistMakerLabel.Text = "";
-            txtRegistMakerKind.Text = "";
-            txtRegistMakerMatchStr.Text = "";
-            txtRegistMatchProductNumber.Text = "";
-
-            dgridMakers.ItemsSource = ColViewMaker.ColViewListMakers;
+            service.DbUpdate(dispinfoMakerData, mysqlDbConn);
+            lgridRegisterMaker.Visibility = Visibility.Collapsed;
 
             return;
         }
@@ -1540,6 +1566,7 @@ namespace WpfScrapingArrangement
         /// <param name="e"></param>
         private void btnOpenRegistMaker_Click(object sender, RoutedEventArgs e)
         {
+            /*
             if (lgridMakers.Visibility == System.Windows.Visibility.Visible)
             {
                 var sel = dgridMakers.SelectedItems;
@@ -1573,6 +1600,7 @@ namespace WpfScrapingArrangement
                 txtRegistMakerKind.Text = txtKind.Text;
             }
             lgridRegistMaker.Visibility = System.Windows.Visibility.Visible;
+             */
         }
 
         private MovieImportData GetImportDataFromUIElement()

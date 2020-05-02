@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WpfScrapingArrangement.common
@@ -43,6 +44,17 @@ namespace WpfScrapingArrangement.common
                 SizeStr = String.Format("{0:###,###,###,###}{1}", DoubleSize, Unit);
 
             return SizeStr;
+        }
+
+        public static string CheckRegex(string myPattern)
+        {
+            if (!String.IsNullOrEmpty(myPattern))
+            {
+                Regex regex = new Regex(myPattern);
+                regex.Match("ABCD");
+            }
+
+            return myPattern;
         }
     }
 }

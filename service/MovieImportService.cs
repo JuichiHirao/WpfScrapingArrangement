@@ -290,7 +290,7 @@ namespace WpfScrapingArrangement.service
             else
                 dbcon = new MySqlDbConnection();
 
-            sqlcmd = "SELECT ID, COPY_TEXT, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, SELL_DATE, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, RATING, JAV_POST_DATE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, CREATED_AT, UPDATED_AT ";
+            sqlcmd = "SELECT ID, COPY_TEXT, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, SELL_DATE, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, RATING, JAV_POST_DATE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, jav_id, CREATED_AT, UPDATED_AT ";
             sqlcmd = sqlcmd + "FROM import ";
             sqlcmd = sqlcmd + "ORDER BY CREATED_AT DESC";
 
@@ -326,8 +326,9 @@ namespace WpfScrapingArrangement.service
                     newestData.Package = MysqlExportCommon.GetDbString(reader, 16);
                     newestData.Thumbnail = MysqlExportCommon.GetDbString(reader, 17);
                     newestData.DownloadFiles = MysqlExportCommon.GetDbString(reader, 18);
-                    newestData.CreateDate = MysqlExportCommon.GetDbDateTime(reader, 19);
-                    newestData.UpdateDate = MysqlExportCommon.GetDbDateTime(reader, 20);
+                    newestData.JavId = MysqlExportCommon.GetDbLong(reader, 19);
+                    newestData.CreateDate = MysqlExportCommon.GetDbDateTime(reader, 20);
+                    newestData.UpdateDate = MysqlExportCommon.GetDbDateTime(reader, 21);
                 }
             }
             finally
@@ -355,7 +356,7 @@ namespace WpfScrapingArrangement.service
             else
                 dbcon = new MySqlDbConnection();
 
-            sqlcmd = "SELECT ID, copy_text, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, sell_date, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, CREATED_AT, UPDATED_AT, HD_KIND, movie_file_id, RATING, JAV_POST_DATE, SIZE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, SEARCH_RESULT, DETAIL ";
+            sqlcmd = "SELECT ID, copy_text, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, sell_date, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, CREATED_AT, UPDATED_AT, HD_KIND, movie_file_id, RATING, JAV_POST_DATE, SIZE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, SEARCH_RESULT, DETAIL, jav_id ";
             sqlcmd = sqlcmd + "FROM import ";
             sqlcmd = sqlcmd + "ORDER BY JAV_POST_DATE ";
 
@@ -402,6 +403,7 @@ namespace WpfScrapingArrangement.service
                         data.DownloadFiles = MysqlExportCommon.GetDbString(reader, 23);
                         data.SearchResult = MysqlExportCommon.GetDbString(reader, 24);
                         data.Detail = MysqlExportCommon.GetDbString(reader, 25);
+                        data.JavId = MysqlExportCommon.GetDbLong(reader, 26);
 
                         listData.Add(data);
                     }
