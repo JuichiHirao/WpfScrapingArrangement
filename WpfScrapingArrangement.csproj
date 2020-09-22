@@ -89,6 +89,7 @@
     <Compile Include="data\AvContentsData.cs" />
     <Compile Include="data\KoreanPornoData.cs" />
     <Compile Include="data\KoreanPornoFileInfo.cs" />
+    <Compile Include="data\MakerData.cs" />
     <Compile Include="data\MovieImportData.cs" />
     <Compile Include="data\ReplaceInfoData.cs" />
     <Compile Include="data\StoreData.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="service\FilesRegisterService.cs" />
     <Compile Include="service\HdUpdateService.cs" />
     <Compile Include="service\KoreanPornoService.cs" />
+    <Compile Include="service\MakerService.cs" />
     <Compile Include="service\MovieFileContentsService.cs" />
     <Compile Include="service\MovieImportService.cs" />
     <Compile Include="service\ReplaceInfoService.cs" />
