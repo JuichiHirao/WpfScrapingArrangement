@@ -118,6 +118,41 @@ namespace WpfScrapingArrangement.service
             return data;
         }
 
+        public void DbUpdateIsTarget(MovieImportData myData, MySqlDbConnection myDbCon)
+        {
+            MySqlDbConnection dbcon;
+            string sqlcmd = "";
+
+            // 引数にコネクションが指定されていた場合は指定されたコネクションを使用
+            if (myDbCon != null)
+                dbcon = myDbCon;
+            else
+                dbcon = new MySqlDbConnection();
+
+            sqlcmd = "UPDATE import ";
+            sqlcmd += "SET is_target = @IsTarget ";
+            sqlcmd += "WHERE ID = @Id ";
+
+            MySqlCommand command = new MySqlCommand(sqlcmd, dbcon.getMySqlConnection());
+            DataTable dtSaraly = new DataTable();
+
+            List<MySqlParameter> listSqlParams = new List<MySqlParameter>();
+
+            MySqlParameter sqlparam = new MySqlParameter("@IsTarget", MySqlDbType.Bit);
+            sqlparam.Value = myData.IsTarget;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@Id", MySqlDbType.Int32);
+            sqlparam.Value = myData.Id;
+            listSqlParams.Add(sqlparam);
+
+            dbcon.SetParameter(listSqlParams.ToArray());
+
+            dbcon.execSqlCommand(sqlcmd);
+
+            return;
+        }
+
         public void DbUpdate(MovieImportData myData, MySqlDbConnection myDbCon)
         {
             MySqlDbConnection dbcon;
@@ -290,7 +325,7 @@ namespace WpfScrapingArrangement.service
             else
                 dbcon = new MySqlDbConnection();
 
-            sqlcmd = "SELECT ID, COPY_TEXT, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, SELL_DATE, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, RATING, JAV_POST_DATE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, jav_id, CREATED_AT, UPDATED_AT ";
+            sqlcmd = "SELECT ID, COPY_TEXT, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, SELL_DATE, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, RATING, JAV_POST_DATE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, jav_id, is_target, CREATED_AT, UPDATED_AT ";
             sqlcmd = sqlcmd + "FROM import ";
             sqlcmd = sqlcmd + "ORDER BY CREATED_AT DESC";
 
@@ -327,8 +362,9 @@ namespace WpfScrapingArrangement.service
                     newestData.Thumbnail = MysqlExportCommon.GetDbString(reader, 17);
                     newestData.DownloadFiles = MysqlExportCommon.GetDbString(reader, 18);
                     newestData.JavId = MysqlExportCommon.GetDbLong(reader, 19);
-                    newestData.CreateDate = MysqlExportCommon.GetDbDateTime(reader, 20);
-                    newestData.UpdateDate = MysqlExportCommon.GetDbDateTime(reader, 21);
+                    newestData.IsTarget = MysqlExportCommon.GetDbBool(reader, 20);
+                    newestData.CreateDate = MysqlExportCommon.GetDbDateTime(reader, 21);
+                    newestData.UpdateDate = MysqlExportCommon.GetDbDateTime(reader, 22);
                 }
             }
             finally
@@ -356,7 +392,7 @@ namespace WpfScrapingArrangement.service
             else
                 dbcon = new MySqlDbConnection();
 
-            sqlcmd = "SELECT ID, copy_text, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, sell_date, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, CREATED_AT, UPDATED_AT, HD_KIND, movie_file_id, RATING, JAV_POST_DATE, SIZE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, SEARCH_RESULT, DETAIL, jav_id ";
+            sqlcmd = "SELECT ID, copy_text, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, sell_date, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, CREATED_AT, UPDATED_AT, HD_KIND, movie_file_id, RATING, JAV_POST_DATE, SIZE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, SEARCH_RESULT, DETAIL, jav_id, is_target ";
             sqlcmd = sqlcmd + "FROM import ";
             sqlcmd = sqlcmd + "ORDER BY JAV_POST_DATE ";
 
@@ -404,6 +440,7 @@ namespace WpfScrapingArrangement.service
                         data.SearchResult = MysqlExportCommon.GetDbString(reader, 24);
                         data.Detail = MysqlExportCommon.GetDbString(reader, 25);
                         data.JavId = MysqlExportCommon.GetDbLong(reader, 26);
+                        data.IsTarget = MysqlExportCommon.GetDbBool(reader, 27);
 
                         listData.Add(data);
                     }

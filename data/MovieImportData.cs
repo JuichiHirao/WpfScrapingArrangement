@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -7,8 +8,18 @@ using System.Threading.Tasks;
 
 namespace WpfScrapingArrangement
 {
-    public class MovieImportData
+    public class MovieImportData : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void NotifyPropertyChanged(String info)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(info));
+            }
+        }
+
         public List<HdInfo> HdKindList = new List<HdInfo>();
 
         private void SetHdInfo()
@@ -303,6 +314,20 @@ namespace WpfScrapingArrangement
         public string Detail { get; set; }
 
         public long JavId { get; set; }
+
+        protected bool _IsTarget;
+        public bool IsTarget
+        {
+            get
+            {
+                return _IsTarget;
+            }
+            set
+            {
+                _IsTarget = value;
+                NotifyPropertyChanged("IsTarget");
+            }
+        }
 
         public DateTime CreateDate { get; set; }
 
