@@ -52,6 +52,8 @@ namespace WpfScrapingArrangement
         private KoreanPornoCollection ColViewKoreanPorno;
         private StoreCollection ColViewStore;
 
+        private MakerService serviceMaker = null;
+
         private List<ReplaceInfoData> dispctrlListReplaceInfoActress;
 
         private List<MovieMaker> dispinfoSelectDataGridMakers = null;
@@ -202,6 +204,22 @@ namespace WpfScrapingArrangement
                 }
             }
 
+            private string _KoreanPornoName;
+
+            public string KoreanPornoName
+            {
+                get { return this._KoreanPornoName; }
+                set
+                {
+                    this._KoreanPornoName = value;
+                    var handler = this.PropertyChanged;
+                    if (handler != null)
+                    {
+                        handler(this, new PropertyChangedEventArgs("KoreanPornoName"));
+                    }
+                }
+            }
+
             private string _GenerateTargetFileName;
 
             public string GenerateTargetFileName
@@ -311,6 +329,8 @@ namespace WpfScrapingArrangement
             {
                 MessageBox.Show(ex.Message);
             }
+
+            serviceMaker = new MakerService();
         }
 
         /// <summary>
@@ -1085,6 +1105,18 @@ namespace WpfScrapingArrangement
 
                 SetUIElementFromImportData(dispinfoSelectMovieImportData);
                 btnPasteActressesSearch_Click(null, null);
+                long makerId = mysqlDbConn.getLongSql("SELECT makers_id FROM jav WHERE id = " + dispinfoSelectMovieImportData.JavId);
+                dispinfoMakerData = serviceMaker.GetById(makerId, mysqlDbConn);
+
+                if (dispinfoMakerData != null)
+                {
+                    if (String.IsNullOrEmpty(dispinfoMakerData.InformationUrl))
+                        btnOpenMakerInfoUrl.Visibility = Visibility.Hidden;
+                    else
+                        btnOpenMakerInfoUrl.Visibility = Visibility.Visible;
+                }
+                else
+                    btnOpenMakerInfoUrl.Visibility = Visibility.Hidden;
 
                 foreach (TargetFiles file in ColViewFileGeneTargetFiles.ColViewListTargetFiles)
                 {
@@ -1476,9 +1508,14 @@ namespace WpfScrapingArrangement
         {
             lgridMakers.Visibility = System.Windows.Visibility.Visible;
 
-            MakerService service = new MakerService();
+            if (dispinfoSelectMovieImportData == null)
+                return;
+
             long makerId = mysqlDbConn.getLongSql("SELECT makers_id FROM jav WHERE id = " + dispinfoSelectMovieImportData.JavId);
-            dispinfoMakerData = service.GetById(makerId, mysqlDbConn);
+            dispinfoMakerData = serviceMaker.GetById(makerId, mysqlDbConn);
+
+            if (dispinfoMakerData == null)
+                return;
 
             txtRegisterMakerId.Text = dispinfoMakerData.Id.ToString();
             txtRegisterMakerName.Text = dispinfoMakerData.Name;
@@ -1551,56 +1588,23 @@ namespace WpfScrapingArrangement
                 return;
             }
 
-            MakerService service = new MakerService();
-
-            service.DbUpdate(dispinfoMakerData, mysqlDbConn);
+            serviceMaker.DbUpdate(dispinfoMakerData, mysqlDbConn);
             lgridRegisterMaker.Visibility = Visibility.Collapsed;
+            lgridMakers.Visibility = Visibility.Collapsed;
+
 
             return;
         }
 
         /// <summary>
-        /// 追加・編集ボタン押下時
+        /// URL表示ボタン押下時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnOpenRegistMaker_Click(object sender, RoutedEventArgs e)
+        private void btnOpenMakerInfoUrl_Click(object sender, RoutedEventArgs e)
         {
-            /*
-            if (lgridMakers.Visibility == System.Windows.Visibility.Visible)
-            {
-                var sel = dgridMakers.SelectedItems;
-
-                if (sel.Count == 1)
-                {
-                    MovieMaker data = sel[0] as MovieMaker;
-                    txtRegistId.Text = data.Id.ToString();
-                    txtRegistMakerName.Text = data.Name;
-                    txtRegistMakerKind.Text = data.Kind.ToString();
-                    txtRegistMakerLabel.Text = data.Label;
-                    txtRegistMakerMatchStr.Text = data.MatchStr;
-                    txtRegistMatchProductNumber.Text = data.MatchProductNumber;
-                }
-            }
-            else
-            {
-                txtRegistId.Text = "";
-                if (txtMaker.Text.IndexOf("：") > 0)
-                {
-                    string[] splitStr = { "：" };
-                    string[] makerandlabel = txtMaker.Text.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
-                    txtRegistMakerName.Text = makerandlabel[0];
-                    txtRegistMakerLabel.Text = makerandlabel[1];
-                }
-                else
-                {
-                    //txtRegistMakerLabel = "";
-                    txtRegistMakerName.Text = txtMaker.Text;
-                }
-                txtRegistMakerKind.Text = txtKind.Text;
-            }
-            lgridRegistMaker.Visibility = System.Windows.Visibility.Visible;
-             */
+            if (dispinfoMakerData != null && !String.IsNullOrEmpty(dispinfoMakerData.InformationUrl))
+                System.Diagnostics.Process.Start(dispinfoMakerData.InformationUrl);
         }
 
         private MovieImportData GetImportDataFromUIElement()
@@ -1647,15 +1651,26 @@ namespace WpfScrapingArrangement
                 return null;
 
             BitmapImage bitmap = new BitmapImage();
-            var stream = System.IO.File.OpenRead(myImagePathname);
-            bitmap.BeginInit();
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.StreamSource = stream;
-            bitmap.EndInit();
-            stream.Close();
-            stream.Dispose();
+            try
+            {
+                var stream = System.IO.File.OpenRead(myImagePathname);
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = stream;
+                bitmap.EndInit();
+                stream.Close();
+                stream.Dispose();
+            }
+            catch (System.NotSupportedException ex)
+            {
+                Debug.Write(ex);
+            }
             int width = bitmap.PixelWidth;
             int height = bitmap.PixelHeight;
+
+            if (width <= 0 || height <= 0)
+                return null;
+
             return bitmap;
         }
 
@@ -1698,6 +1713,9 @@ namespace WpfScrapingArrangement
                 imagePackage.Width = lgridDataGridFiles.ColumnDefinitions[0].ActualWidth;
                 imagePackage.Height = 300;
                 imagePackage.Source = this.GetImageStream(packagePathname);
+
+                if (imagePackage.Source == null)
+                    MessageBox.Show("package画像が開けません");
             }
 
             if (File.Exists(thumbnailPathname))
@@ -1705,6 +1723,8 @@ namespace WpfScrapingArrangement
                 imagePackage.Width = lgridDataGridFiles.ColumnDefinitions[1].ActualWidth;
                 imagePackage.Height = 300;
                 imageThumbnail.Source = this.GetImageStream(thumbnailPathname);
+                if (imageThumbnail.Source == null)
+                    MessageBox.Show("thumbnail画像が開けません");
             }
         }
 
@@ -1929,13 +1949,20 @@ namespace WpfScrapingArrangement
                 selData.CopyText = TxtKoreanPornoName.Text;
                 selData.ProductNumber = TxtKoreanPornoArchiveFile.Text;
                 selData.Tag = TxtKoreanPornoTag.Text;
+                if (!String.IsNullOrEmpty(TxtKoreanPornoRating.Text))
+                    selData.Rating = Convert.ToInt32(TxtKoreanPornoRating.Text);
+                else
+                    selData.Rating = 0;
                 StoreData storeData = ColViewStore.GetMatchByPath(txtKoreanPornoExportPath.Text);
 
                 KoreanPornoService service = new KoreanPornoService(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text, ChkKoreanPornoMoveFolder.IsChecked);
-                service.ExecuteArrangement(selData, storeData, (List<KoreanPornoFileInfo>)dgridKoreanPornoFolder.ItemsSource);
+                service.ExecuteArrangement(selData, storeData, (List<KoreanPornoFileInfo>)dgridKoreanPornoFolder.ItemsSource, TxtKoreanPornoComment.Text);
 
                 ColViewKoreanPorno.Delete(dispinfoSelectDataGridKoreanPorno);
                 ChkKoreanPornoMoveFolder.IsChecked = false;
+
+                TxtKoreanPornoRating.Text = "0";
+                TxtKoreanPornoComment.Text = "";
             }
             catch (Exception ex)
             {
@@ -2309,6 +2336,27 @@ namespace WpfScrapingArrangement
             {
                 txtResultRating.Text = "exception " + ex.Message;
             }
+        }
+
+        private void dgridKoreanPornoFolder_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            KoreanPornoFileInfo dispinfoKoreanPornoFolderItem = (KoreanPornoFileInfo)dgridKoreanPornoFolder.SelectedItem;
+            if (dispinfoKoreanPornoFolderItem == null)
+                return;
+
+            Process.Start(dispinfoKoreanPornoFolderItem.FileInfo.FullName);
+        }
+
+        private void btnKoreanPornoNoTarget_Click(object sender, RoutedEventArgs e)
+        {
+            MovieImportData selData = dispinfoSelectDataGridKoreanPorno;
+            selData.IsTarget = true;
+
+            MovieImportService service = new MovieImportService();
+            service.DbUpdateIsTarget(selData, new MySqlDbConnection());
+
+            dgridKoreanPorno.Visibility = System.Windows.Visibility.Visible;
+
         }
     }
 }

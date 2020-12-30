@@ -104,8 +104,12 @@ namespace WpfScrapingArrangement.common
             string resultEvaluation = "", evaluation = "";
             int maxFav = 0;
             string maxActress = "";
+
             foreach (string actress in myArrayActress)
             {
+                if (String.IsNullOrEmpty(actress))
+                    continue;
+
                 string[] arrFavActress = contentsService.GetFavoriteActresses(actress, dockerMysqlConn);
 
                 List<AvContentsData> avContentsList = new List<AvContentsData>();

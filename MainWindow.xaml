@@ -44,7 +44,7 @@
                     <AdornedElementPlaceholder x:Name="Holder">
                     </AdornedElementPlaceholder>
                 </StackPanel>
-                <!--<Label Content="{Binding ElementName=Holder, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}" Foreground="Red"/>-->
+                <Label Content="{Binding ElementName=Holder, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}" Foreground="Red"/>
             </StackPanel>
         </ControlTemplate>
         <local:TextBoxHasErrorToButtonIsEnabledConverter x:Key="buttonEnabled"/>
@@ -243,7 +243,7 @@
             </Grid>
         </Grid>
         <!-- End of lgridMain -->
-        <Grid Name="lgridFilenameGenerate" Visibility="Visible" >
+        <Grid Name="lgridFilenameGenerate" Visibility="Collapsed" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
@@ -363,11 +363,11 @@
                 </Grid>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80" />
                         <ColumnDefinition />
+                        <ColumnDefinition Width="80" />
                     </Grid.ColumnDefinitions>
-                    <Button Content="M追加" Name="btnOpenRegistMakerFromData" Margin="5,3,5,3" Height="30" VerticalAlignment="Bottom" Click="btnOpenRegistMaker_Click" />
-                    <TextBox Name="txtMaker" Margin="5,3,5,3" TextWrapping="Wrap" Grid.Column="1" MouseDoubleClick="txtMaker_MouseDoubleClick" />
+                    <TextBox Name="txtMaker" Margin="5,3,5,3" TextWrapping="Wrap" MouseDoubleClick="txtMaker_MouseDoubleClick" />
+                    <Button Content="URL表示" Name="btnOpenMakerInfoUrl" Margin="5,3,5,3" Height="30" VerticalAlignment="Bottom" Grid.Column="1" Click="btnOpenMakerInfoUrl_Click" />
                 </Grid>
                 <Grid MinHeight="50" Margin="5,5,5,5" Grid.Row="2">
                     <TextBox Name="txtTitle" Margin="5,3,5,3" VerticalAlignment="Center" TextWrapping="Wrap" FontSize="18" LostFocus="GenerateFilename" MouseDoubleClick="txtChangeFileName_MouseDoubleClick" />
@@ -393,7 +393,7 @@
                     <TextBox Name="txtThumbnail" Margin="5,3,5,3" Grid.Column="2" />
                     <Button Margin="3,3,3,3" Grid.Column="3" />
                 </Grid>
-                <TextBox Name="txtFilenameGenerate" Validation.ErrorTemplate="{StaticResource TextBoxErrorTemplate}" Margin="5,3,5,3" HorizontalAlignment="Left" FontSize="24" Grid.Row="6" TextWrapping="Wrap">
+                <TextBox Name="txtFilenameGenerate" Validation.ErrorTemplate="{StaticResource TextBoxErrorTemplate}" Margin="25,3,5,3" HorizontalAlignment="Left" FontSize="24" Grid.Row="6" TextWrapping="Wrap">
                     <TextBox.Text>
                         <Binding Path="GenerateTargetFileName" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -462,7 +462,6 @@
                     </Border.Background>
                 </Border>
                 <WrapPanel Margin="5,5,5,5" Orientation="Horizontal">
-                    <Button Name="btnOpenRegistMaker" Content="追加・編集" Width="100" Margin="5,3,3,0" HorizontalAlignment="Left" Click="btnOpenRegistMaker_Click" />
                     <CheckBox Name="chkKindOne" Margin="0,3,0,0" Content="1" Click="OnMakersFilter" />
                     <CheckBox Name="chkKindTwo" Margin="0,3,0,0" Content="2" Click="OnMakersFilter" />
                     <CheckBox Name="chkKindThree" Margin="0,3,0,0" Content="3" Click="OnMakersFilter" />
@@ -661,7 +660,7 @@
             <TextBox Name="txtFileGenSelectFilename" TextWrapping="Wrap" Grid.Row="2" />
             <Button Content="キャンセル" Name="btnSelectCancel" FontSize="24" Height="40" Width="200" Margin="5,5,5,5" HorizontalAlignment="Center" Grid.Row="3" Click="btnSelectCancel_Click" />
         </Grid>
-        <Grid Name="lgridKoreanPornoArrange" Visibility="Collapsed" >
+        <Grid Name="lgridKoreanPornoArrange" Visibility="Visible" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
@@ -714,7 +713,7 @@
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
-                    <RowDefinition Height="160" />
+                    <RowDefinition Height="200" />
                     <RowDefinition />
                     <RowDefinition Height="70" />
                 </Grid.RowDefinitions>
@@ -727,6 +726,7 @@
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
                         <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -734,7 +734,15 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="ファイル名" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" />
-                    <TextBox Name="TxtKoreanPornoName" Margin="5,3,5,3"  FontSize="18" TextWrapping="Wrap" Grid.Row="0" Grid.Column="1" />
+                    <TextBox Name="TxtKoreanPornoName" Validation.ErrorTemplate="{StaticResource TextBoxErrorTemplate}" Margin="5,3,5,3"  FontSize="18" TextWrapping="Wrap" Grid.Row="0" Grid.Column="1">
+                        <TextBox.Text>
+                            <Binding Path="KoreanPornoName" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <local:TextBoxFilenameRule />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                     <TextBlock Text="圧縮ファイル" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Grid.Column="0" Grid.Row="1" />
                     <TextBox Name="TxtKoreanPornoArchiveFile" Margin="5,3,5,3"  FontSize="18" TextWrapping="Wrap" Grid.Column="1" Grid.Row="1" />
                     <WrapPanel Orientation="Horizontal" VerticalAlignment="Bottom" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2">
@@ -747,9 +755,15 @@
                         <TextBox Name="TxtKoreanPornoTag" Width="300" Margin="5,3,5,3" HorizontalAlignment="Center" FontSize="18" />
                         <TextBlock Name="TxtKoreanPornoPostedIn" Width="400" Margin="5,3,5,5" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="12" />
                     </WrapPanel>
+                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Bottom" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4">
+                        <TextBlock Text="Rating" Margin="10,3,3,5" VerticalAlignment="Bottom" FontSize="14"></TextBlock>
+                        <TextBox Name="TxtKoreanPornoRating" Text="0" Width="40" Margin="20,3,5,3" HorizontalAlignment="Center" FontSize="18" />
+                        <TextBlock Text="comment" Margin="10,3,3,5" VerticalAlignment="Bottom" FontSize="14"></TextBlock>
+                        <TextBox Name="TxtKoreanPornoComment" Height="30" MinWidth="300" Margin="5,3,5,3" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="18" />
+                    </WrapPanel>
                     <Button Style="{StaticResource CircleCloseButton}" Width="200" Margin="0,3,3,0" HorizontalAlignment="Right" Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Click="Button_Click" />
                 </Grid>
-                <DataGrid Name="dgridKoreanPornoFolder" Width="Auto" Margin="10,3,10,10" AutoGenerateColumns="False" CanUserAddRows="False" Grid.Row="2" MouseDoubleClick="dgridKoreanPorno_MouseDoubleClick" SelectionChanged="dgridKoreanPorno_SelectionChanged" >
+                <DataGrid Name="dgridKoreanPornoFolder" Width="Auto" Margin="10,3,10,10" AutoGenerateColumns="False" CanUserAddRows="False" Grid.Row="2" SelectionChanged="dgridKoreanPorno_SelectionChanged" MouseDoubleClick="dgridKoreanPornoFolder_MouseDoubleClick" >
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn Header="選択" Binding="{Binding Path=IsSelected}" />
                         <DataGridTemplateColumn Header="ファイル名" Width="300">
@@ -783,10 +797,18 @@
                     </DataGrid.Columns>
                 </DataGrid>
                 <Button Name="btnKoreanPornoExecute" Content="実行" Width="250" Height="50" Margin="5,3,5,3" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="2" Grid.Row="3" Click="btnKoreanPornoExecute_Click" />
+                <Button Name="btnKoreanPornoNoTarget" Content="対象外" Width="150" Height="50" Margin="5,3,5,3" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.ColumnSpan="2" Grid.Row="3" Click="btnKoreanPornoNoTarget_Click" />
             </Grid>
             <DataGrid Name="dgridKoreanPorno" Width="Auto" Margin="10,3,10,10" AutoGenerateColumns="False" CanUserAddRows="False" Grid.Row="1" MouseDoubleClick="dgridKoreanPorno_MouseDoubleClick" SelectionChanged="dgridKoreanPorno_SelectionChanged" >
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="ファイル名" Width="500">
+                    <DataGridTemplateColumn Header="対象外" Width="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=IsTarget}" Margin="5,0,5,0" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="10" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="ファイル名" Width="450">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=CopyText}" Margin="5,0,5,0" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="18" />

@@ -53,6 +53,22 @@ namespace WpfScrapingArrangement
             }
             return myData;
         }
+
+        public static bool GetDbBool(MySqlDataReader myReader, int myColumnNo)
+        {
+            bool myData = false;
+            try
+            {
+                if (!myReader.IsDBNull(myColumnNo))
+                    myData = myReader.GetBoolean(myColumnNo);
+            }
+            catch (Exception)
+            {
+                myData = false;
+            }
+            return myData;
+        }
+
         public static DateTime GetDbDateTime(MySqlDataReader myReader, int myColumnNo)
         {
             DateTime myData = new DateTime(1900, 1, 1);

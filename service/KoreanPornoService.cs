@@ -35,6 +35,7 @@ namespace WpfScrapingArrangement.service
         {
             List<KoreanPornoFileInfo> listFiles = new List<KoreanPornoFileInfo>();
 
+            FileInfo fileInfo = new FileInfo(myArchiveName);
             string pathname = System.IO.Path.Combine(BasePath, myArchiveName);
 
             //if (!Directory.Exists(pathname) && !File.Exists(pathname))
@@ -46,7 +47,8 @@ namespace WpfScrapingArrangement.service
             string oneFilename = "";
             if (!Directory.Exists(pathname))
             {
-                archiveMovieFiles = Directory.GetFiles(BasePath, myArchiveName + "*");
+                string archiveOrMovieFile = myArchiveName.Replace("%20", "_");
+                archiveMovieFiles = Directory.GetFiles(BasePath, archiveOrMovieFile + "*");
                 if (archiveMovieFiles.Length > 0)
                     foreach (string file in archiveMovieFiles)
                     {
@@ -175,7 +177,7 @@ namespace WpfScrapingArrangement.service
             return selFiles;
         }
 
-        public void ExecuteArrangement(MovieImportData myTargetImportData, StoreData myStoreData, List<KoreanPornoFileInfo> myListFileInfo)
+        public void ExecuteArrangement(MovieImportData myTargetImportData, StoreData myStoreData, List<KoreanPornoFileInfo> myListFileInfo, string myComment)
         {
             List<KoreanPornoFileInfo> jpegFiles = new List<KoreanPornoFileInfo>();
             List<KoreanPornoFileInfo> movieFiles = new List<KoreanPornoFileInfo>();
@@ -213,9 +215,8 @@ namespace WpfScrapingArrangement.service
             targetData.Label = ExportPath;
             targetData.LastWriteTime = myTargetImportData.JavPostDate;
             targetData.Tag = myTargetImportData.Tag;
-
-            DbExportContents(targetData, myStoreData);
-            DbExport(targetData, new DbConnection());
+            targetData.Rating = myTargetImportData.Rating;
+            targetData.Comment = myComment;
 
             // ファイル移動先の生成（D:\Downloads\TEMP\KOREAN_PORNO7のフォルダを無ければ作成）
             string moveDestName = new DirectoryInfo(ExportPath).Name;
@@ -228,8 +229,21 @@ namespace WpfScrapingArrangement.service
             }
 
             // JPEGファイルsの移動
+            int suffixNum = 1;
             foreach (var jpegFile in jpegFiles)
-                File.Move(jpegFile.FileInfo.FullName, Path.Combine(moveDestPath, jpegFile.ChangeFilename));
+            {
+                string filename = "";
+                if (jpegFiles.Count == 1)
+                    filename = $"{myTargetImportData.CopyText}.jpg";
+                else
+                    filename = $"{myTargetImportData.CopyText}_{suffixNum}.jpg";
+
+                if (File.Exists(Path.Combine(moveDestPath, filename)))
+                    throw new Exception($"JPEG 既に同じファイル名が存在します {filename}");
+
+                File.Move(jpegFile.FileInfo.FullName, Path.Combine(moveDestPath, filename));
+                suffixNum++;
+            }
 
             // フォルダ作成しての動画の移動はJPEGの移動が終了してから
             if (IsCheckMoveFolder == true)
@@ -244,17 +258,28 @@ namespace WpfScrapingArrangement.service
             }
 
             // 動画ファイルの移動、ファイル更新日
+            suffixNum = 1;
             foreach (KoreanPornoFileInfo file in movieFiles)
             {
                 string filename = "";
                 if (IsCheckMoveFolder == true)
                     filename = file.DisplayFilename;
                 else
-                    filename = file.ChangeFilename;
+                {
+                    
+                    if (movieFiles.Count == 1)
+                        filename = $"{myTargetImportData.CopyText}{file.FileInfo.Extension}";
+                    else
+                        filename = $"{myTargetImportData.CopyText}_{suffixNum}{file.FileInfo.Extension}";
+
+                }
+                if (File.Exists(Path.Combine(moveDestPath, filename)))
+                    throw new Exception($"動画 既に同じファイル名が存在します {filename}");
 
                 string destFilename = System.IO.Path.Combine(moveDestPath, filename);
                 // File.SetLastWriteTime(file.FileInfo.FullName, file.ChangeLastWriteTime);
                 File.Move(file.FileInfo.FullName, destFilename);
+                suffixNum++;
             }
 
             if (IsCheckMoveFolder == true)
@@ -274,6 +299,9 @@ namespace WpfScrapingArrangement.service
                     File.Move(file.FileInfo.FullName, destFilename);
                 }
             }
+
+            DbExportContents(targetData, myStoreData);
+            DbExport(targetData, new DbConnection());
 
             string rarFile = myTargetImportData.ProductNumber + ".rar";
             string archiveFilePath = System.IO.Path.Combine(BasePath, rarFile);
@@ -351,8 +379,8 @@ namespace WpfScrapingArrangement.service
             MySqlDbConnection dbcon = new MySqlDbConnection();
 
             // データベースへ登録
-            string sqlCommand = "INSERT INTO av.contents (store_label, name, extension, tag, file_date, file_count, size, file_status) "
-                + "VALUES( @pStoreLabel, @pName, @pExtension, @pTag, @pFileDate, @pFileCount, @pSize, @pFileStatus )";
+            string sqlCommand = "INSERT INTO av.contents (store_label, name, extension, tag, file_date, file_count, size, file_status, rating, comment) "
+                + "VALUES( @pStoreLabel, @pName, @pExtension, @pTag, @pFileDate, @pFileCount, @pSize, @pFileStatus, @pRating, @pComment )";
 
             MySqlCommand command = new MySqlCommand(sqlCommand, dbcon.getMySqlConnection());
 
@@ -391,6 +419,15 @@ namespace WpfScrapingArrangement.service
 
             param = new MySqlParameter("@pFileStatus", MySqlDbType.VarChar);
             param.Value = "exist";
+            listParams.Add(param);
+
+            param = new MySqlParameter("@pRating", MySqlDbType.Int32);
+            param.Value = myData.Rating;
+            listParams.Add(param);
+
+
+            param = new MySqlParameter("@pComment", MySqlDbType.VarChar);
+            param.Value = myData.Comment;
             listParams.Add(param);
 
             dbcon.SetParameter(listParams.ToArray());

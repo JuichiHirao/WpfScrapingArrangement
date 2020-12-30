@@ -18,5 +18,9 @@ namespace WpfScrapingArrangement
         public int Status { get; set; }
 
         public string Tag { get; set; }
+
+        public int Rating { get; set; }
+
+        public string Comment { get; set; }
     }
 }
