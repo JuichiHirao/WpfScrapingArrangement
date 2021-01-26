@@ -31,6 +31,133 @@ namespace WpfScrapingArrangement.service
                 IsCheckMoveFolder = false;
         }
 
+        public List<KoreanPornoFileInfo> GetFileInfo(string myExtractPathname, string myBaseFilename, DateTime myChangeLastWriteTime, string myArchiveName)
+        {
+            List<KoreanPornoFileInfo> listFiles = new List<KoreanPornoFileInfo>();
+
+            FileInfo fileInfo = new FileInfo(myArchiveName);
+            //string pathname = System.IO.Path.Combine(BasePath, myArchiveName);
+
+            //if (!Directory.Exists(pathname) && !File.Exists(pathname))
+            //    return null;
+
+            string[] archiveMovieFiles = null;
+            bool isExist = false;
+            Regex regexMovie = new Regex(FileGeneTargetFilesCollection.REGEX_MOVIEONLY_EXTENTION, RegexOptions.IgnoreCase);
+            string oneFilename = "";
+            if (!Directory.Exists(myExtractPathname))
+            {
+                string archiveOrMovieFile = myArchiveName.Replace("%20", "_");
+                archiveMovieFiles = Directory.GetFiles(BasePath, archiveOrMovieFile + "*");
+                if (archiveMovieFiles.Length > 0)
+                    foreach (string file in archiveMovieFiles)
+                    {
+                        if (regexMovie.IsMatch(file))
+                        {
+                            oneFilename = file;
+                            isExist = true;
+                            break;
+                        }
+                    }
+
+                if (File.Exists(myExtractPathname))
+                    isExist = true;
+
+            }
+            else
+                isExist = true;
+
+            if (isExist == false)
+                return null;
+
+            Regex regexImage = new Regex(FileGeneTargetFilesCollection.REGEX_IMAGE_EXTENTION, RegexOptions.IgnoreCase);
+
+            List<string> jpegFileList = new List<string>();
+
+            string[] archiveFiles = Directory.GetFiles(BasePath, myArchiveName + "*", System.IO.SearchOption.TopDirectoryOnly);
+            foreach (string file in archiveFiles)
+            {
+                if (regexImage.IsMatch(file))
+                    jpegFileList.Add(file);
+            }
+
+            string[] jpegFiles = jpegFileList.ToArray();
+
+            int fileNo = 1;
+            foreach (string file in jpegFiles)
+            {
+                KoreanPornoFileInfo koreanFile = new KoreanPornoFileInfo(file);
+
+                string suffix = "";
+                if (jpegFiles.Length > 1)
+                    suffix = "_" + fileNo;
+
+                koreanFile.IsSelected = true;
+
+                koreanFile.DisplayFilename = "XXX" + suffix + koreanFile.FileInfo.Extension.ToLower();
+                koreanFile.ChangeFilename = myBaseFilename + suffix + koreanFile.FileInfo.Extension.ToLower();
+
+                koreanFile.ChangeLastWriteTime = myChangeLastWriteTime;
+
+                fileNo++;
+
+                listFiles.Add(koreanFile);
+            }
+
+            string[] files = null;
+
+            if (Directory.Exists(myExtractPathname))
+                files = Directory.GetFiles(myExtractPathname, "*", System.IO.SearchOption.AllDirectories);
+            else
+            {
+                files = new string[1];
+                if (oneFilename.Length > 0)
+                    files[0] = oneFilename;
+                else
+                    files[0] = myExtractPathname;
+            }
+
+            Regex regex = new Regex(FileGeneTargetFilesCollection.REGEX_MOVIE_EXTENTION, RegexOptions.IgnoreCase);
+
+            List<KoreanPornoFileInfo> listKFiles = new List<KoreanPornoFileInfo>();
+            int fileCnt = 0;
+            foreach (string file in files)
+            {
+                KoreanPornoFileInfo koreanFile = new KoreanPornoFileInfo(file);
+
+                if (regex.IsMatch(koreanFile.FileInfo.Name))
+                    fileCnt++;
+            }
+
+            fileNo = 1;
+            foreach (string file in files)
+            {
+                KoreanPornoFileInfo koreanFile = new KoreanPornoFileInfo(file);
+
+                Match match = regex.Match(koreanFile.FileInfo.Name);
+                if (match.Success)
+                {
+                    koreanFile.IsSelected = true;
+
+                    string suffix = "";
+                    if (fileCnt > 1)
+                        suffix = "_" + fileNo;
+
+                    koreanFile.DisplayChangeFilename = "名前" + suffix + koreanFile.FileInfo.Extension.ToLower();
+                    koreanFile.ChangeFilename = myBaseFilename + suffix + koreanFile.FileInfo.Extension.ToLower();
+
+                    koreanFile.ChangeLastWriteTime = myChangeLastWriteTime;
+
+                    fileNo++;
+                }
+                listFiles.Add(koreanFile);
+            }
+
+
+            return listFiles;
+        }
+
+
         public List<KoreanPornoFileInfo> GetFileInfo(string myBaseFilename, DateTime myChangeLastWriteTime, string myArchiveName)
         {
             List<KoreanPornoFileInfo> listFiles = new List<KoreanPornoFileInfo>();

@@ -24,6 +24,7 @@ using WpfScrapingArrangement.collection;
 using WpfScrapingArrangement.data;
 using WpfScrapingArrangement.common;
 using MySql.Data.MySqlClient;
+using NUnrar.Archive;
 
 namespace WpfScrapingArrangement
 {
@@ -1664,6 +1665,12 @@ namespace WpfScrapingArrangement
             catch (System.NotSupportedException ex)
             {
                 Debug.Write(ex);
+                return null;
+            }
+            catch (System.ArgumentException ex)
+            {
+                Debug.Write(ex);
+                return null;
             }
             int width = bitmap.PixelWidth;
             int height = bitmap.PixelHeight;
@@ -1891,6 +1898,38 @@ namespace WpfScrapingArrangement
                 KoreanPornoService service = new KoreanPornoService(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text, (bool)ChkKoreanPornoMoveFolder.IsChecked);
                 List<KoreanPornoFileInfo> listFiles = service.GetFileInfo(selData.CopyText, selData.JavPostDate, dispinfoSelectDataGridKoreanPorno.ProductNumber);
 
+                string pathname = Path.Combine(txtKoreanPornoPath.Text, dispinfoSelectDataGridKoreanPorno.Filename);
+
+                if (listFiles == null)
+                {
+                    RarArchive file = RarArchive.Open(pathname.Replace("%20", "_"));
+                    try
+                    {
+                        foreach (RarArchiveEntry rarFile in file.Entries)
+                        {
+                            //string path = Path.Combine(_pathToExtract, rarFile.FilePath);
+                            //using (FileStream output = File.OpenWrite(path))
+                            //    rarFile.WriteTo(output);
+                            string[] arrPathSplit = rarFile.FilePath.Split('\\');
+
+                            Debug.Print("rarfile [" + arrPathSplit[0] + "]");
+
+                            string exractPathname = Path.Combine(txtKoreanPornoPath.Text, arrPathSplit[0]);
+                            if (Directory.Exists(exractPathname))
+                            {
+                                listFiles = service.GetFileInfo(exractPathname, selData.CopyText, selData.JavPostDate, dispinfoSelectDataGridKoreanPorno.ProductNumber);
+                                break;
+                            }
+                        }
+                    }
+                    // Invalid Rar Header: 3
+                    catch (NUnrar.InvalidRarFormatException ex)
+                    {
+                        Debug.Write(ex);
+                        MessageBox.Show("回答失敗 " + ex.Message);
+                        return;
+                    }
+                }
                 if (listFiles == null)
                 {
                     MessageBox.Show("まだ解凍されていません");
