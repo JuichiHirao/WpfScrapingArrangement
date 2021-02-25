@@ -48,7 +48,7 @@ namespace WpfScrapingArrangement
                 throw new Exception("credential.jsonに存在しない[" + target + "]が指定されました or " + ex.Message);
             }
 
-            String connectionInfo = "Data Source=tcp:" + datasource + ";Initial Catalog=" + database + ";Persist Security Info=True;User ID=" + user + ";Password=" + password;
+            String connectionInfo = "Data Source=tcp:" + datasource + ";Initial Catalog=" + database + ";Persist Security Info=True;User ID=" + user + ";Password=" + password + ";Connection Timeout=60";
 
             try
             {

@@ -125,16 +125,17 @@ namespace WpfScrapingArrangement
 
             List<MovieFileContents> listMContents = new List<MovieFileContents>();
 
-            string queryString = "SELECT ID, NAME, SIZE, FILE_DATE, LABEL, SELL_DATE, PRODUCT_NUMBER, TAG, EXTENSION FROM MOVIE_FILES ORDER BY FILE_DATE DESC ";
+            string queryString = "SELECT ID, NAME, SIZE, FILE_DATE, LABEL, SELL_DATE, PRODUCT_NUMBER, TAG, EXTENSION FROM MOVIE_FILES ORDER BY ID  ";
 
             dbcon.openConnection();
 
             SqlCommand command = new SqlCommand(queryString, dbcon.getSqlConnection());
+            command.CommandTimeout = 120;
 
             //SqlParameter param = new SqlParameter("@pActressName", SqlDbType.VarChar);
             //param.Value = myGroupName;
             //command.Parameters.Add(param);
-            
+
             SqlDataReader reader = command.ExecuteReader();
 
             do

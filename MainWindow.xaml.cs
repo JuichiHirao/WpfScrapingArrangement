@@ -25,6 +25,7 @@ using WpfScrapingArrangement.data;
 using WpfScrapingArrangement.common;
 using MySql.Data.MySqlClient;
 using NUnrar.Archive;
+using NLog;
 
 namespace WpfScrapingArrangement
 {
@@ -33,6 +34,8 @@ namespace WpfScrapingArrangement
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public readonly static RoutedCommand PasteDateCopy = new RoutedCommand("PasteDateCopy", typeof(MainWindow));
         public readonly static RoutedCommand ChangeModeNormalRar = new RoutedCommand("ChangeModeNormalRar", typeof(MainWindow));
         public readonly static RoutedCommand ChangeModeNormalMovie = new RoutedCommand("ChangeModeNormalMovie", typeof(MainWindow));
@@ -259,6 +262,8 @@ namespace WpfScrapingArrangement
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            logger.Debug("処理開始");
+
             dockerMysqlConn = new MySqlDbConnection(MySqlDbConnection.DockerDatabase, MySqlDbConnection.DockerDataSource
                 , MySqlDbConnection.DockerPort, MySqlDbConnection.DockerUser, MySqlDbConnection.DockerPassword);
 
@@ -2190,6 +2195,8 @@ namespace WpfScrapingArrangement
 
         private void btnFileGenExecute_Click(object sender, RoutedEventArgs e)
         {
+            logger.Debug("登録開始");
+
             dispinfoSelectMovieImportData = GetImportDataFromUIElement();
             List<TargetFiles> files = GetSelectCheckExistFiles();
 
@@ -2245,6 +2252,7 @@ namespace WpfScrapingArrangement
                 return;
             }
 
+            logger.Debug("Validation終了");
             FilesRegisterService service = new FilesRegisterService(new DbConnection());
 
             // 動画のファイル名変更
@@ -2269,6 +2277,7 @@ namespace WpfScrapingArrangement
                 return;
             }
 
+            logger.Debug("動画のファイル名変更");
             try
             {
                 string jpegExtension = ".jpg";
@@ -2278,6 +2287,7 @@ namespace WpfScrapingArrangement
                 // データベースへ登録用の情報を生成、登録
                 service.SetDbMovieFilesInfo(dispinfoSelectMovieImportData, storeData);
                 service.DbExport();
+                logger.Debug("DbExport completed");
 
                 // パッケージ画像のコピー
                 File.Copy(packageSource, packageDest);
@@ -2290,6 +2300,8 @@ namespace WpfScrapingArrangement
 
                 // 動画ファイルの移動、日付コピー等の実行
                 service.Execute();
+
+                logger.Debug("動画ファイルの移動 completed");
             }
             catch (Exception exp)
             {
@@ -2307,6 +2319,7 @@ namespace WpfScrapingArrangement
                 dgridDestFile.Items.Filter = null;
             }
 
+            logger.Debug("動画ファイル削除");
             try
             {
                 service.DeleteFiles(ColViewFileGeneTargetFiles.listTargetFiles);
@@ -2315,11 +2328,14 @@ namespace WpfScrapingArrangement
             {
                 MessageBox.Show("削除失敗 " + ex.Message);
             }
+            logger.Debug("動画ファイル削除完了");
 
             ColViewMovieImport.Refresh();
 
             ClearUIElement();
             ColViewMovieImport.Refresh();
+
+            logger.Debug("ImportRefresh");
         }
 
         private void btnJumpUrl_Click(object sender, RoutedEventArgs e)

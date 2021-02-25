@@ -12,12 +12,15 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.VisualBasic.FileIO;
 using MySql.Data.MySqlClient;
+using NLog;
 using WpfScrapingArrangement.data;
 
 namespace WpfScrapingArrangement.service
 {
     class FilesRegisterService
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         DbConnection dbcon;
 
         public string BasePath = "";        // txtBasePath.Text
@@ -200,15 +203,18 @@ namespace WpfScrapingArrangement.service
             {
                 // Mysqlのcontentsへ登録
                 DbExportContents();
+                logger.Debug("DbExportContents mysql register completed");
 
                 // SQL ServerのMOVIE_FILESへ登録
                 dbcon.BeginTransaction("MOVIE_REGISTER");
                 DbExportMovieFiles();
                 dbcon.CommitTransaction();
+                logger.Debug("DbExportContents sql server register completed");
 
                 // MOVIE_IMPORTから削除
                 MovieImportService service = new MovieImportService();
                 service.DbDelete(targetImportData, new MySqlDbConnection());
+                logger.Debug("mysql import delete completed");
             }
             catch (Exception ex)
             {
