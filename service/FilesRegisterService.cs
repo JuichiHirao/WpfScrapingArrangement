@@ -206,9 +206,9 @@ namespace WpfScrapingArrangement.service
                 logger.Debug("DbExportContents mysql register completed");
 
                 // SQL ServerのMOVIE_FILESへ登録
-                dbcon.BeginTransaction("MOVIE_REGISTER");
-                DbExportMovieFiles();
-                dbcon.CommitTransaction();
+                // dbcon.BeginTransaction("MOVIE_REGISTER");
+                // DbExportMovieFiles();
+                // dbcon.CommitTransaction();
                 logger.Debug("DbExportContents sql server register completed");
 
                 // MOVIE_IMPORTから削除

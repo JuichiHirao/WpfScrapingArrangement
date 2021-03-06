@@ -46,8 +46,6 @@ namespace WpfScrapingArrangement
         private MySqlDbConnection dockerMysqlConn = null;
         private MySqlDbConnection mysqlDbConn = null;
 
-        private MovieFileContentsCollection ColViewMovieFileContents;
-
         private MovieImportCollection ColViewMovieImport;
         private FileGeneTargetFilesCollection ColViewFileGeneTargetFiles;
         private FileGeneTargetFilesCollection ColViewArrangementTarget; // dgridArrangementTarget
@@ -294,8 +292,6 @@ namespace WpfScrapingArrangement
             ColViewKoreanPorno = new collection.KoreanPornoCollection(txtKoreanPornoPath.Text, txtKoreanPornoExportPath.Text);
             ColViewMovieImport = new MovieImportCollection();
             ColViewStore = new StoreCollection();
-
-            ColViewMovieFileContents = new collection.MovieFileContentsCollection();
 
             ColViewMaker = new collection.MakerCollection();
 
@@ -826,6 +822,7 @@ namespace WpfScrapingArrangement
                 try
                 {
                     service.targetImportData = dispinfoSelectMovieImportData;
+                    /* SQL Server使用取りやめでコメントアウト
                     // HD動画への変更の場合
                     HdUpdateService hdUpdateService = new HdUpdateService(new DbConnection());
 
@@ -840,6 +837,7 @@ namespace WpfScrapingArrangement
                         return;
                     }
                     hdUpdateService.Execute(dispinfoSelectMovieImportData, contents);
+                     */
 
                     txtStatusBar.Text = "";
                 }
@@ -1137,12 +1135,17 @@ namespace WpfScrapingArrangement
             }
             else
             {
+                MessageBox.Show("SQL Serverへの登録廃止とともに処理しなくなりました");
+                return;
+
                 txtSearch.Text = dispinfoSelectMovieImportData.GetFileSearchString();
 
                 txtbSourceFilename.Text = dispinfoSelectMovieImportData.Filename;
                 txtChangeFileName.Text = dispinfoSelectMovieImportData.Filename;
 
-                List<MovieFileContents> matchFileContentsList = ColViewMovieFileContents.MatchProductNumber(dispinfoSelectMovieImportData.ProductNumber);
+                MovieFileContentsService movieFileContentsService = new MovieFileContentsService();
+                //List<MovieFileContents> matchFileContentsList = ColViewMovieFileContents.MatchProductNumber(dispinfoSelectMovieImportData.ProductNumber);
+                List<MovieFileContents> matchFileContentsList = null;
 
                 if ((bool)dispinfoSelectMovieImportData.RarFlag)
                 {
@@ -1428,13 +1431,16 @@ namespace WpfScrapingArrangement
 
             if (String.IsNullOrEmpty(importData.ProductNumber))
             {
+                MessageBox.Show("SQL Server廃止とともに処理はなくなりました");
+
                 // MOVIE_IMPORT_DATAに既存にデータがが存在すれば表示
                 dispinfoSelectMovieImportData = ColViewMovieImport.GetDataByProductId(importData.ProductNumber);
 
                 List<MovieFileContents> matchList = null;
 
                 // HDの場合は、MOVIE_FILESからも一致するデータが存在するかを取得
-                matchList = ColViewMovieFileContents.MatchProductNumber(importData.ProductNumber);
+                // matchList = ColViewMovieFileContents.MatchProductNumber(importData.ProductNumber);
+                matchList = null;
 
                 if (matchList.Count == 1)
                 {
@@ -2123,11 +2129,15 @@ namespace WpfScrapingArrangement
         {
             if (tbtnFileGenHdUpdate.IsChecked != null)
             {
+                //MessageBox.Show("HD機能はSQLServer廃止で処理がなくなりました");
+                return;
+
                 bool updateChecked = (bool)tbtnFileGenHdUpdate.IsChecked;
 
                 if (updateChecked && txtbFileGenFileId.Text.Length <= 0)
                 {
-                    List<MovieFileContents> fileContentsList = ColViewMovieFileContents.MatchProductNumber(txtProductNumber.Text);
+                    // List<MovieFileContents> fileContentsList = ColViewMovieFileContents.MatchProductNumber(txtProductNumber.Text);
+                    List<MovieFileContents> fileContentsList = null;
 
                     if (fileContentsList.Count > 0)
                     {
