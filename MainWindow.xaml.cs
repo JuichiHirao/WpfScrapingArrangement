@@ -331,6 +331,7 @@ namespace WpfScrapingArrangement
             {
                 MessageBox.Show(ex.Message);
             }
+            txtbImportCount.Text = Convert.ToString(ColViewMovieImport.GetCount());
 
             serviceMaker = new MakerService();
         }
@@ -2345,6 +2346,8 @@ namespace WpfScrapingArrangement
             ClearUIElement();
             ColViewMovieImport.Refresh();
 
+            txtbImportCount.Text = Convert.ToString(ColViewMovieImport.GetCount());
+
             logger.Debug("ImportRefresh");
         }
 
@@ -2422,6 +2425,11 @@ namespace WpfScrapingArrangement
 
             dgridKoreanPorno.Visibility = System.Windows.Visibility.Visible;
 
+        }
+
+        private void txtFilenameGenerate_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TxtbFilenameLength.Text = Convert.ToString(txtFilenameGenerate.Text.Length);
         }
     }
 }

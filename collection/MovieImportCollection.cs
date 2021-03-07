@@ -29,6 +29,14 @@ namespace WpfScrapingArrangement.collection
             collection = CollectionViewSource.GetDefaultView(listData);
         }
 
+        public int GetCount()
+        {
+            if (listData == null)
+                return 0;
+
+            return listData.Count();
+        }
+
         public MovieImportData GetDataByProductId(string myProductNumber)
         {
             foreach (MovieImportData imp in listData)
