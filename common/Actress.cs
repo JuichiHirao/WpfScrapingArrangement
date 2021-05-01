@@ -177,7 +177,7 @@ namespace WpfScrapingArrangement.common
         {
             string[] arrActresses = common.Actress.ParseTag(myTag);
 
-            return Actress.GetEvaluation(arrActresses, contentsService, dockerMysqlConn);
+            return Actress.GetEvaluation(arrActresses, contentsService, new MySqlDbConnection());
         }
     }
 }

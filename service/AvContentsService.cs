@@ -16,8 +16,7 @@ namespace WpfScrapingArrangement.service
         {
             if (myDbCon == null)
                 // string myDatabase, string myDataSource, string myPort, string myUser, string myPassword
-                myDbCon = new MySqlDbConnection(MySqlDbConnection.DockerDatabase, MySqlDbConnection.DockerDataSource
-                    , MySqlDbConnection.DockerPort, MySqlDbConnection.DockerUser, MySqlDbConnection.DockerPassword);
+                myDbCon = new MySqlDbConnection();
 
             List<string> actressList = new List<string>();
             string queryString = "SELECT label, name FROM av.fav WHERE label = @StoreLabel or name like @LikeName ";
@@ -71,8 +70,7 @@ namespace WpfScrapingArrangement.service
         {
             if (myDbCon == null)
                 // string myDatabase, string myDataSource, string myPort, string myUser, string myPassword
-                myDbCon = new MySqlDbConnection(MySqlDbConnection.DockerDatabase, MySqlDbConnection.DockerDataSource
-                    , MySqlDbConnection.DockerPort, MySqlDbConnection.DockerUser, MySqlDbConnection.DockerPassword);
+                myDbCon = new MySqlDbConnection();
 
             string queryString = "SELECT sum(size) FROM av.v_contents WHERE store_label = @StoreLabel ";
 

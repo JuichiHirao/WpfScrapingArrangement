@@ -440,6 +440,9 @@ namespace WpfScrapingArrangement
             lgridFilenameGenerate.Visibility = System.Windows.Visibility.Collapsed;
 
             lgridKoreanPornoArrange.Visibility = System.Windows.Visibility.Visible;
+
+            gridSelectTargetFilename.Visibility = System.Windows.Visibility.Collapsed;
+
         }
 
         private void btnDateCopyPasteSource_Click(object sender, RoutedEventArgs e)
@@ -1513,7 +1516,7 @@ namespace WpfScrapingArrangement
         {
             string ClipboardText = ClipBoardCommon.GetText();
 
-            txtFilenameGenDate.Text = ClipboardText;
+            txtFilenameGenDate.Text = ClipboardText.Replace("年", "-").Replace("月", "-").Replace("日", "");
             GenerateFilename(null, null);
         }
 
@@ -1938,7 +1941,7 @@ namespace WpfScrapingArrangement
                     catch (NUnrar.InvalidRarFormatException ex)
                     {
                         Debug.Write(ex);
-                        MessageBox.Show("回答失敗 " + ex.Message);
+                        MessageBox.Show("解凍失敗 " + ex.Message);
                         return;
                     }
                 }
@@ -2430,6 +2433,40 @@ namespace WpfScrapingArrangement
         private void txtFilenameGenerate_TextChanged(object sender, TextChangedEventArgs e)
         {
             TxtbFilenameLength.Text = Convert.ToString(txtFilenameGenerate.Text.Length);
+        }
+
+        private void OpenPackageImage_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayOpenFullImage(txtPackage.Text);
+        }
+
+        private void OpenThumbnailImage_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayOpenFullImage(txtThumbnail.Text);
+        }
+
+        private void DisplayOpenFullImage(string myImageFilename)
+        {
+            //txtPackage.Text = "001fc47d.jpg";
+            if (String.IsNullOrEmpty(myImageFilename))
+                return;
+
+            string imagePathname = Path.Combine(JpegStorePath, myImageFilename);
+
+            if (!File.Exists(imagePathname))
+                return;
+
+            lgridAllImage.Visibility = Visibility.Visible;
+            lgridFilenameGenerate.Visibility = Visibility.Collapsed;
+
+            imageFullScreen.Source = this.GetImageStream(imagePathname);
+        }
+
+        private void lgridAllImage_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // 左クリックではなぜか効かず
+            lgridAllImage.Visibility = Visibility.Collapsed;
+            lgridFilenameGenerate.Visibility = Visibility.Visible;
         }
     }
 }
