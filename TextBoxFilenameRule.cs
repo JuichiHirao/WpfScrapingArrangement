@@ -71,7 +71,7 @@ namespace WpfScrapingArrangement
                     catch (Exception e)
                     {
                         Debug.Write(e);
-                        return new ValidationResult(false, "有効ではないファイル名です");
+                        return new ValidationResult(false, "有効ではないファイル名です " + filename.Length + "");
                     }
                 }
             }

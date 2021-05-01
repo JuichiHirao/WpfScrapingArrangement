@@ -243,6 +243,11 @@
             </Grid>
         </Grid>
         <!-- End of lgridMain -->
+        <Grid Name="lgridAllImage" Visibility="Collapsed" MouseLeftButtonDown="lgridAllImage_MouseDown" MouseDown="lgridAllImage_MouseDown">
+            <ScrollViewer>
+                <Image Name="imageFullScreen" />
+            </ScrollViewer>
+        </Grid>
         <Grid Name="lgridFilenameGenerate" Visibility="Collapsed" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -279,6 +284,7 @@
                     <Button Name="btnRefrectActress" Content="Ac反映" Margin="5,5,5,5" Click="btnRefrectActress_Click" />
                     <Button Name="btnJumpUrl" Content="URL" Margin="5,5,5,5" Click="btnJumpUrl_Click" />
                     <TextBlock Name="txtbTotalSize" Margin="5,5,5,5" FontSize="24" />
+                    <TextBlock Name="txtbImportCount" Margin="20,5,5,5" FontSize="24" />
                 </WrapPanel>
                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.ColumnSpan="3" Grid.Row="1" Height="40">
                     <TextBlock Name="txtbPostDate" Margin="5,5,5,5" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="12" />
@@ -374,6 +380,7 @@
                 </Grid>
                 <Grid Margin="5,3,5,3" VerticalAlignment="Bottom" Grid.Row="3">
                     <WrapPanel Orientation="Horizontal">
+                        <TextBlock Name="TxtbFilenameLength" Margin="3,5,0,5" />
                         <Button Name="btnPasteActresses" Content="Ac貼付" Width="70" Margin="5,0,5,0" HorizontalAlignment="Left" Click="btnPasteActresses_Click" />
                         <TextBox Name="txtTag" Margin="5,3,5,3" TextWrapping="Wrap" />
                         <Button Name="btnPasteActressesClear" Content="Clear" Width="50" Margin="20,5,5,5" HorizontalAlignment="Left" Click="btnPasteActressesClear_Click" />
@@ -389,11 +396,11 @@
                         <ColumnDefinition Width="30" />
                     </Grid.ColumnDefinitions>
                     <TextBox Name="txtPackage" Margin="5,3,5,3" />
-                    <Button Margin="3,3,3,3" Grid.Column="1" />
+                    <Button Name="OpenPackageImage" Margin="3,3,3,3" Grid.Column="1" Click="OpenPackageImage_Click" />
                     <TextBox Name="txtThumbnail" Margin="5,3,5,3" Grid.Column="2" />
-                    <Button Margin="3,3,3,3" Grid.Column="3" />
+                    <Button Name="OpenThumbnailImage" Margin="3,3,3,3" Grid.Column="3" Click="OpenThumbnailImage_Click" />
                 </Grid>
-                <TextBox Name="txtFilenameGenerate" Validation.ErrorTemplate="{StaticResource TextBoxErrorTemplate}" Margin="25,3,5,3" HorizontalAlignment="Left" FontSize="24" Grid.Row="6" TextWrapping="Wrap">
+                <TextBox Name="txtFilenameGenerate" Validation.ErrorTemplate="{StaticResource TextBoxErrorTemplate}" Margin="25,3,5,3" HorizontalAlignment="Left" FontSize="24" Grid.Row="6" TextWrapping="Wrap" TextChanged="txtFilenameGenerate_TextChanged">
                     <TextBox.Text>
                         <Binding Path="GenerateTargetFileName" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
