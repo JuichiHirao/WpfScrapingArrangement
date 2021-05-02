@@ -25,8 +25,22 @@ namespace WpfScrapingArrangement.service
 
             dbcon.openConnection();
 
-            sqlcmd = "INSERT INTO import ( COPY_TEXT, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, PRODUCT_DATE, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, HD_KIND, MOVIE_FILES_ID, PACKAGE, THUMBNAIL, DOWNLOAD_FILES ) ";
-            sqlcmd = sqlcmd + "VALUES( @CopyText, @Kind, @MatchProduct, @ProductNumber, @ProductDate, @Maker, @Title, @Actresses, @RarFlag, @SplitFlag, @NameOnlyFlag, @Tag, @Filename, @HdKind, @MovieFilesId, @Package, @Thumbnail ) ";
+            sqlcmd = "INSERT INTO import(copy_text"
+                    + ", kind, match_product, product_number, sell_date"
+                    + ", maker, title, actresses, rar_flag"
+                    + ", tag, filename, hd_kind, movie_file_id"
+                    + ", split_flag, name_only_flag, jav_post_date, package"
+                    + ", thumbnail, download_files, search_result, detail"
+                    + ", jav_url, rating, size, jav_id, is_target"
+                    + ", created_at, updated_at)"
+                    + " VALUES( @CopyText"
+                    + ", @Kind, @MatchProduct, @ProductNumber, @ProductDate "
+                    + ", @Maker, @Title, @Actresses, @RarFlag "
+                    + ", @Tag, @Filename, @HdKind, @MovieFilesId "
+                    + ", @SplitFlag, @NameOnlyFlag, @JavPostDate, @Package "
+                    + ", @Thumbnail, @DownloadFIles, @SearchResult, @Detail "
+                    + ", @JavUrl, @Rating, @Size, @JavId, @IsTarget"
+                    + ", @CreatedAt, @UpdatedAt);";
 
             MySqlCommand command = new MySqlCommand(sqlcmd, dbcon.getMySqlConnection());
             DataTable dtSaraly = new DataTable();
@@ -69,14 +83,6 @@ namespace WpfScrapingArrangement.service
             sqlparam.Value = myData.RarFlag;
             listSqlParams.Add(sqlparam);
 
-            sqlparam = new MySqlParameter("@SplitFlag", MySqlDbType.Int16);
-            sqlparam.Value = myData.SplitFlag;
-            listSqlParams.Add(sqlparam);
-
-            sqlparam = new MySqlParameter("@NameOnlyFlag", MySqlDbType.Int16);
-            sqlparam.Value = myData.NameOnlyFlag;
-            listSqlParams.Add(sqlparam);
-
             sqlparam = new MySqlParameter("@Tag", MySqlDbType.VarChar);
             sqlparam.Value = myData.Tag;
             listSqlParams.Add(sqlparam);
@@ -94,6 +100,18 @@ namespace WpfScrapingArrangement.service
             sqlparam.Value = myData.FileId;
             listSqlParams.Add(sqlparam);
 
+            sqlparam = new MySqlParameter("@SplitFlag", MySqlDbType.Int16);
+            sqlparam.Value = myData.SplitFlag;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@NameOnlyFlag", MySqlDbType.Int16);
+            sqlparam.Value = myData.NameOnlyFlag;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@JavPostDate", MySqlDbType.DateTime);
+            sqlparam.Value = myData.JavPostDate;
+            listSqlParams.Add(sqlparam);
+
             sqlparam = new MySqlParameter("@Package", MySqlDbType.VarChar);
             sqlparam.Value = myData.Package;
             listSqlParams.Add(sqlparam);
@@ -104,6 +122,42 @@ namespace WpfScrapingArrangement.service
 
             sqlparam = new MySqlParameter("@DownloadFiles", MySqlDbType.VarChar);
             sqlparam.Value = myData.DownloadFiles;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@SearchResult", MySqlDbType.VarChar);
+            sqlparam.Value = myData.SearchResult;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@Detail", MySqlDbType.VarChar);
+            sqlparam.Value = myData.Detail;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@JavUrl", MySqlDbType.VarChar);
+            sqlparam.Value = myData.JavUrl;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@Rating", MySqlDbType.Int16);
+            sqlparam.Value = myData.Rating;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@Size", MySqlDbType.Int64);
+            sqlparam.Value = myData.Size;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@JavId", MySqlDbType.Int32);
+            sqlparam.Value = myData.JavId;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@IsTarget", MySqlDbType.Int16);
+            sqlparam.Value = myData.IsTarget;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@CreatedAt", MySqlDbType.DateTime);
+            sqlparam.Value = myData.CreateDate;
+            listSqlParams.Add(sqlparam);
+
+            sqlparam = new MySqlParameter("@UpdatedAt", MySqlDbType.DateTime);
+            sqlparam.Value = myData.UpdateDate;
             listSqlParams.Add(sqlparam);
 
             command.Parameters.AddRange(listSqlParams.ToArray());
@@ -392,7 +446,7 @@ namespace WpfScrapingArrangement.service
             else
                 dbcon = new MySqlDbConnection();
 
-            sqlcmd = "SELECT ID, copy_text, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, sell_date, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, CREATED_AT, UPDATED_AT, HD_KIND, movie_file_id, RATING, JAV_POST_DATE, SIZE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, SEARCH_RESULT, DETAIL, jav_id, is_target ";
+            sqlcmd = "SELECT ID, copy_text, KIND, MATCH_PRODUCT, PRODUCT_NUMBER, sell_date, MAKER, TITLE, ACTRESSES, RAR_FLAG, SPLIT_FLAG, NAME_ONLY_FLAG, TAG, FILENAME, CREATED_AT, UPDATED_AT, HD_KIND, movie_file_id, RATING, JAV_POST_DATE, SIZE, PACKAGE, THUMBNAIL, DOWNLOAD_FILES, SEARCH_RESULT, DETAIL, jav_id, is_target, jav_url ";
             sqlcmd = sqlcmd + "FROM import ";
             sqlcmd = sqlcmd + "ORDER BY JAV_POST_DATE ";
 
@@ -441,6 +495,7 @@ namespace WpfScrapingArrangement.service
                         data.Detail = MysqlExportCommon.GetDbString(reader, 25);
                         data.JavId = MysqlExportCommon.GetDbLong(reader, 26);
                         data.IsTarget = MysqlExportCommon.GetDbBool(reader, 27);
+                        data.JavUrl = MysqlExportCommon.GetDbString(reader, 28);
 
                         listData.Add(data);
                     }
