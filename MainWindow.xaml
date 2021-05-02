@@ -262,12 +262,14 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="120" />
                     <ColumnDefinition />
-                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="50" />
                 </Grid.ColumnDefinitions>
                 <Button Name="btnPasteTitleText" Content="貼付" Margin="5,3,5,3" Click="btnPasteTitleText_Click" />
                 <TextBox Name="txtTitleText" Margin="5,3,5,3" FontSize="18" Grid.Column="1" TextWrapping="Wrap" />
-                <Button Name="btnPasteTextRefresh" Content="更新" Margin="5,3,5,3" Grid.Column="2" Click="btnPasteTextRefresh_Click" />
-                <WrapPanel Orientation="Horizontal" Grid.ColumnSpan="3" Grid.Row="1" Height="60">
+                <Button Name="btnJavUrlJump" Content="URL" Margin="5,3,5,3" Grid.Column="2" Click="btnJavUrlJump_Click" />
+                <Button Name="btnPasteTextRefresh" Content="更新" Margin="5,3,5,3" Grid.Column="3" Click="btnPasteTextRefresh_Click" />
+                <WrapPanel Orientation="Horizontal" Grid.ColumnSpan="4" Grid.Row="1" Height="60">
                     <TextBlock Text="ImpId" Margin="5,5,5,5" FontSize="16" />
                     <TextBlock Name="txtbFileGenImportId" Margin="5,5,5,5" FontSize="24" />
                     <TextBlock Text="FileId" Margin="5,5,5,5" FontSize="16" />
@@ -286,10 +288,10 @@
                     <TextBlock Name="txtbTotalSize" Margin="5,5,5,5" FontSize="24" />
                     <TextBlock Name="txtbImportCount" Margin="20,5,5,5" FontSize="24" />
                 </WrapPanel>
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.ColumnSpan="3" Grid.Row="1" Height="40">
+                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.ColumnSpan="4" Grid.Row="1" Height="40">
                     <TextBlock Name="txtbPostDate" Margin="5,5,5,5" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="12" />
                 </WrapPanel>
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.ColumnSpan="3" Grid.Row="2">
+                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.ColumnSpan="4" Grid.Row="2">
                     <ToggleButton Name="tbtnFileGeneTextAddRar" Content="RAR" Height="40" Width="100" Margin="5,5,5,5" />
                     <ToggleButton Name="tbtnFileGenHdUpdate" Content="HDデータ更新" Height="40" Width="100" Margin="35,5,5,5" Click="tbtnFileGenHdUpdate_Click" />
                     <ToggleButton Name="tbtnFileGenSplit" Content="FILE分割" Height="40" Width="100" Margin="35,5,5,5" Click="tbtnFileGenHdUpdate_Click" />
@@ -418,6 +420,7 @@
                         <RowDefinition Height="50" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
+                    <Button Content="コピー" Name="btnFileGenImportCopy" Width="80" Margin="5,5,600,5" HorizontalAlignment="Center" Grid.Column="1" Click="btnFileGenImportCopy_Click" />
                     <Button Content="登録実行" Name="btnFileGenExecute" Width="150" Margin="297,5,307.667,5" HorizontalAlignment="Center" Click="btnFileGenExecute_Click" Grid.Column="1" />
                     <Button Content="更新" Name="btnFileGenUpdate" Width="150" Margin="0,5,4.667,5" HorizontalAlignment="Right" Click="btnFileGenUpdate_Click" Grid.Column="1" />
                     <TextBox Name="txtFileGeneSearchText" Width="400" Margin="5,0,0,5" HorizontalAlignment="Left" Grid.Row="1" Grid.ColumnSpan="2" />

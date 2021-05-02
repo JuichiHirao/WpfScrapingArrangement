@@ -2468,5 +2468,58 @@ namespace WpfScrapingArrangement
             lgridAllImage.Visibility = Visibility.Collapsed;
             lgridFilenameGenerate.Visibility = Visibility.Visible;
         }
+
+        private void btnFileGenImportCopy_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("コピーを作成します、宜しいですか？", "コピー確認", MessageBoxButton.OKCancel);
+
+            if (result == MessageBoxResult.OK)
+            {
+                MovieImportData sourceData = new MovieImportData();
+
+                sourceData.StoreLabel = dispinfoSelectMovieImportData.StoreLabel;
+                sourceData.CopyText = dispinfoSelectMovieImportData.CopyText;
+                sourceData.Kind = dispinfoSelectMovieImportData.Kind;
+                sourceData.MatchProduct = dispinfoSelectMovieImportData.MatchProduct;
+                sourceData.ProductNumber = dispinfoSelectMovieImportData.ProductNumber;
+                sourceData.ProductDate = dispinfoSelectMovieImportData.ProductDate;
+                sourceData.StrMaker = dispinfoSelectMovieImportData.StrMaker;
+                sourceData.Maker = dispinfoSelectMovieImportData.Maker;
+                sourceData.Title = dispinfoSelectMovieImportData.Title;
+                sourceData.Actresses = dispinfoSelectMovieImportData.Actresses;
+                sourceData.HdKind = dispinfoSelectMovieImportData.HdKind;
+                sourceData.HdFlag = dispinfoSelectMovieImportData.HdFlag;
+                sourceData.SplitFlag = dispinfoSelectMovieImportData.SplitFlag;
+                sourceData.Tag = dispinfoSelectMovieImportData.Tag;
+                sourceData.Rating = dispinfoSelectMovieImportData.Rating;
+                sourceData.Size = dispinfoSelectMovieImportData.Size;
+                sourceData.Filename = dispinfoSelectMovieImportData.Filename;
+                sourceData.Package = dispinfoSelectMovieImportData.Package;
+                sourceData.Thumbnail = dispinfoSelectMovieImportData.Thumbnail;
+                sourceData.DownloadFiles = dispinfoSelectMovieImportData.DownloadFiles;
+                sourceData.JavPostDate = dispinfoSelectMovieImportData.JavPostDate;
+                sourceData.SearchResult = dispinfoSelectMovieImportData.SearchResult;
+                sourceData.Detail = dispinfoSelectMovieImportData.Detail;
+                sourceData.JavId = dispinfoSelectMovieImportData.JavId;
+                sourceData.JavUrl = dispinfoSelectMovieImportData.JavUrl;
+                sourceData.IsTarget = dispinfoSelectMovieImportData.IsTarget;
+                sourceData.CreateDate = dispinfoSelectMovieImportData.CreateDate;
+                sourceData.UpdateDate = dispinfoSelectMovieImportData.UpdateDate;
+
+                MovieImportService serviceImport = new MovieImportService();
+                serviceImport.DbExport(sourceData, new MySqlDbConnection());
+
+                ColViewMovieImport.Refresh();
+            }
+
+        }
+
+        private void btnJavUrlJump_Click(object sender, RoutedEventArgs e)
+        {
+            if (dispinfoSelectMovieImportData == null)
+                return;
+
+            Process.Start(dispinfoSelectMovieImportData.JavUrl);
+        }
     }
 }

@@ -315,6 +315,8 @@ namespace WpfScrapingArrangement
 
         public long JavId { get; set; }
 
+        public string JavUrl { get; set; }
+
         protected bool _IsTarget;
         public bool IsTarget
         {
