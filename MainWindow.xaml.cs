@@ -310,7 +310,17 @@ namespace WpfScrapingArrangement
             ReplaceInfoService serviceReplaceInfo = new ReplaceInfoService();
             dispctrlListReplaceInfoActress = serviceReplaceInfo.GetTypeAll(data.ReplaceInfoData.EnumType.actress, new MySqlDbConnection());
 
+            SetTotalSize();
+
+            txtbImportCount.Text = Convert.ToString(ColViewMovieImport.GetCount());
+
+            serviceMaker = new MakerService();
+        }
+
+        private void SetTotalSize()
+        {
             AvContentsService serviceContent = new AvContentsService();
+
             try
             {
                 StoreData storeData = ColViewStore.GetMatchByPath(txtLabelPath.Text);
@@ -327,15 +337,11 @@ namespace WpfScrapingArrangement
                 }
                 txtbTotalSize.Text = DisplaySize;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-            txtbImportCount.Text = Convert.ToString(ColViewMovieImport.GetCount());
-
-            serviceMaker = new MakerService();
         }
-
         /// <summary>
         /// 日付コピーを実行するとDataGridがColViewではなくなるので、日付コピーが終了した後は
         /// DataGridへの紐付けをColViewへ戻す
@@ -2350,6 +2356,8 @@ namespace WpfScrapingArrangement
             ColViewMovieImport.Refresh();
 
             txtbImportCount.Text = Convert.ToString(ColViewMovieImport.GetCount());
+
+            SetTotalSize();
 
             logger.Debug("ImportRefresh");
         }
