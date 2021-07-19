@@ -89,6 +89,7 @@
     <Compile Include="common\Actress.cs" />
     <Compile Include="common\CommonMethod.cs" />
     <Compile Include="common\MySqlDbExportCommon.cs" />
+    <Compile Include="common\RowColorConverter.cs" />
     <Compile Include="data\AvContentsData.cs" />
     <Compile Include="data\KoreanPornoData.cs" />
     <Compile Include="data\KoreanPornoFileInfo.cs" />

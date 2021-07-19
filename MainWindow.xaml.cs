@@ -315,6 +315,24 @@ namespace WpfScrapingArrangement
             txtbImportCount.Text = Convert.ToString(ColViewMovieImport.GetCount());
 
             serviceMaker = new MakerService();
+
+            // KoreanPornoの確認済はグレーにする
+            SetRowColorConverter();
+        }
+        
+        private void SetRowColorConverter()
+        {
+            Style style = new Style();
+            DataGridRow row = new DataGridRow();
+            style.TargetType = row.GetType();
+            Binding bgbinding = null;
+
+            RowColorConverter rowColorConverter = new RowColorConverter();
+            bgbinding = new Binding("IsTarget") { Converter = rowColorConverter };
+
+            style.Setters.Add(new Setter(DataGridRow.BackgroundProperty, bgbinding));
+
+            dgridKoreanPorno.ItemContainerStyle = style;
         }
 
         private void SetTotalSize()
@@ -2423,6 +2441,13 @@ namespace WpfScrapingArrangement
             if (dispinfoKoreanPornoFolderItem == null)
                 return;
 
+            Regex regexImage = new Regex(FileGeneTargetFilesCollection.REGEX_IMAGE_EXTENTION, RegexOptions.IgnoreCase);
+            if (regexImage.IsMatch(dispinfoKoreanPornoFolderItem.FileInfo.Name)) {
+                DisplayOpenFullImage(dispinfoKoreanPornoFolderItem.FileInfo.FullName);
+                return;
+            }
+
+
             Process.Start(dispinfoKoreanPornoFolderItem.FileInfo.FullName);
         }
 
@@ -2465,7 +2490,9 @@ namespace WpfScrapingArrangement
                 return;
 
             lgridAllImage.Visibility = Visibility.Visible;
-            lgridFilenameGenerate.Visibility = Visibility.Collapsed;
+
+            if (dispctrlMode != MODE_KOREANPORNO)
+                lgridFilenameGenerate.Visibility = Visibility.Collapsed;
 
             imageFullScreen.Source = this.GetImageStream(imagePathname);
         }
@@ -2474,7 +2501,8 @@ namespace WpfScrapingArrangement
         {
             // 左クリックではなぜか効かず
             lgridAllImage.Visibility = Visibility.Collapsed;
-            lgridFilenameGenerate.Visibility = Visibility.Visible;
+            if (dispctrlMode != MODE_KOREANPORNO)
+                lgridFilenameGenerate.Visibility = Visibility.Visible;
         }
 
         private void btnFileGenImportCopy_Click(object sender, RoutedEventArgs e)
